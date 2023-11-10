@@ -1,0 +1,20 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+
+import javax.swing.JFrame;
+
+public class ClientLobby extends JFrame {
+	private BufferedReader in;
+	private BufferedWriter out;
+	
+	public ClientLobby(String username, String ip_addr, String port_no) {
+		Socket socket = new Socket("localhost", 9999); // 클라이언트 소켓 생성
+		// System.out.println("연결됨");
+		
+		in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // 클라이언트로부터의 입력 스트림
+		out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // 클라이언트로의 출력 스트림
+	}
+}

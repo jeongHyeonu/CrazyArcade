@@ -1,0 +1,126 @@
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.ServerSocket;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+public class ArcadeClientMain extends JFrame{
+		
+	private JPanel contentPane;
+	private JTextField txtUserName;
+	private JTextField txtIpAddress;
+	private JTextField txtPortNumber;
+	public ImageIcon bg = null;
+	
+	JScrollPane scrollPane;
+	
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ArcadeClientMain frame = new ArcadeClientMain();
+					
+					
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public ArcadeClientMain() {  // 생성자 ------------------------
+		//new Music();
+		ImageIcon bg = new ImageIcon("./connectIMG/login.jpg");//배경화면
+		ImageIcon img = new ImageIcon("./connectIMG/start.png");//스타트 버튼
+		ImageIcon img2 = new ImageIcon("./connectIMG/start2.png");//스타트 버튼 마우스 올렸을때
+		
+		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 690, 483);
+		contentPane = new JPanel() {
+			 public void paintComponent(Graphics g) {
+	                g.drawImage(bg.getImage(), 0, 0, null);
+	                setOpaque(false); //그림을 표시하게 설정,투명하게 조절
+	                super.paintComponent(g);
+	            }
+		};
+		scrollPane = new JScrollPane(contentPane);
+		setContentPane(scrollPane);
+		
+		
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		
+		JLabel lblNewLabel = new JLabel("User Name");
+		lblNewLabel.setBounds(220, 264, 82, 33);
+		contentPane.add(lblNewLabel);
+		
+		txtUserName = new JTextField();
+		txtUserName.setHorizontalAlignment(SwingConstants.CENTER);
+		txtUserName.setBounds(309, 264, 116, 33);
+		contentPane.add(txtUserName);
+		txtUserName.setColumns(10);
+		lblNewLabel.setOpaque(false); 
+		//lblNewLabel.setBackground(Color.WHITE); //글자 배경색 변경
+		lblNewLabel.setForeground(Color.WHITE); //글자색 변경
+		
+		JLabel lblIpAddress = new JLabel("IP Address");
+		lblIpAddress.setBounds(220, 318, 82, 33);
+		contentPane.add(lblIpAddress);
+		
+		txtIpAddress = new JTextField();
+		txtIpAddress.setHorizontalAlignment(SwingConstants.CENTER);
+		txtIpAddress.setText("127.0.0.1");
+		txtIpAddress.setColumns(10);
+		txtIpAddress.setBounds(309, 318, 116, 33);
+		contentPane.add(txtIpAddress);
+		lblIpAddress.setForeground(Color.WHITE); //글자색 변경
+		
+		JLabel lblPortNumber = new JLabel("Port Number");
+		lblPortNumber.setBounds(580, 359, 82, 33);
+		contentPane.add(lblPortNumber);
+		
+		txtPortNumber = new JTextField();
+		txtPortNumber.setText("30000");
+		txtPortNumber.setHorizontalAlignment(SwingConstants.CENTER);
+		txtPortNumber.setColumns(10);
+		txtPortNumber.setBounds(546, 399, 116, 33);
+		contentPane.add(txtPortNumber);
+		lblPortNumber.setForeground(Color.WHITE); //글자색 변경
+		
+		
+		//시작버튼
+		JButton btnConnect = new JButton(img);
+		btnConnect.setRolloverIcon(img2);//버튼에 마우스 올라가면 이미지 변경
+		btnConnect.setBorderPainted(false);// 버튼 테두리 설정해제
+		btnConnect.setBounds(235, 377, 190, 55);
+		
+		btnConnect.addActionListener(new ActionListener(){ // 내부클래스로 액션 이벤트 처리 클래스
+			public void actionPerformed(ActionEvent e) {
+				String username = txtUserName.getText().trim();
+				String ip_addr = txtIpAddress.getText().trim();
+				String port_no = txtPortNumber.getText().trim();
+				
+				ClientView view = new ClientView(username, ip_addr, port_no);
+				setVisible(false);
+			}
+		});
+		contentPane.add(btnConnect);
+	}
+}

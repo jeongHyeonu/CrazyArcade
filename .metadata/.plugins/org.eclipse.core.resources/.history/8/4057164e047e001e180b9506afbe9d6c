@@ -1,0 +1,32 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
+public class ClientView {
+	
+	private Socket socket; // 연결소켓
+	private InputStream is;
+	private OutputStream os;
+	private DataInputStream dis;
+	private DataOutputStream dos;
+
+	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
+}
+	public ClientView(String username, String ip_addr, String port_no) {
+	try {
+		socket = new Socket(ip_addr, Integer.parseInt(port_no));
+		oos = new ObjectOutputStream(socket.getOutputStream());
+		oos.flush();
+		ois = new ObjectInputStream(socket.getInputStream());
+	} catch (NumberFormatException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		
+	}
+}

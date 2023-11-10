@@ -1,0 +1,4 @@
+
+public class ClientLobby(String username, String ip_addr, String port_no) {
+
+}
