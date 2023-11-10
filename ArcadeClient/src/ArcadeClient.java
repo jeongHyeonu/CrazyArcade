@@ -25,10 +25,13 @@ public class ArcadeClient extends JFrame{
 	
 	JScrollPane scrollPane;
 	
-	private ImageIcon bg = new ImageIcon("./LoginImages/LoginBackground.png");//배경화면
+	private ImageIcon bg = new ImageIcon("./LoginImages/LoginBackground.png"); //배경화면
+	private ImageIcon nameLabelImg = new ImageIcon("./LoginImages/nameLabel.png"); //이름 라벨 이미지
+	private ImageIcon idLabelImg = new ImageIcon("./LoginImages/idLabel.png"); //아이디 라벨 이미지
+	private ImageIcon gameStartButtonImg = new ImageIcon("./LoginImages/gameStartButton.png"); //게임 시작 버튼 이미지
 	
-	private int width = 600;
-	private int height = 600;
+	private int width = bg.getIconWidth();
+	private int height = bg.getIconHeight()+30;
 	
 	public static void main(String[] args) {
 		ArcadeClient clientLogin = new ArcadeClient();
@@ -37,9 +40,10 @@ public class ArcadeClient extends JFrame{
 	public ArcadeClient() {  // 생성자
 		setTitle("크레이지아케이드 - 로그인");
 		setLocation(0,0);
-		setSize(width,height);
+		setSize(width,height+30);
 		setLayout(null);
 		setVisible(true);
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// 배경
@@ -49,38 +53,37 @@ public class ArcadeClient extends JFrame{
 		add(backgroundLabel);
 		
 		// 유저 이름 라벨
-		JLabel userNameLabel = new JLabel("User Name");
-		userNameLabel.setSize(100,20);
-		userNameLabel.setLocation(200,500);
-		add(userNameLabel);
+		JLabel userNameLabel = new JLabel(nameLabelImg);
+		userNameLabel.setVisible(true);
+		userNameLabel.setSize(100,30);
+		userNameLabel.setLocation(290,440);
+		backgroundLabel.add(userNameLabel);
 		
 		// 유저 이름 텍스트필드
 		JTextField userNameTextField = new JTextField();
-		userNameTextField.setSize(100,20);
-		userNameTextField.setLocation(250,500);
-		userNameTextField.setColumns(10);
-		add(userNameTextField);
+		userNameTextField.setSize(100,25);
+		userNameTextField.setLocation(400,440);
+		backgroundLabel.add(userNameTextField);
 		
 		// 아이디 라벨
-		JLabel idLabel = new JLabel("ID");
-		idLabel.setSize(100,20);
-		idLabel.setLocation(200,550);
-		add(idLabel);
+		JLabel idLabel = new JLabel(idLabelImg);
+		idLabel.setVisible(true);
+		idLabel.setSize(100,30);
+		idLabel.setLocation(290,470);
+		backgroundLabel.add(idLabel);
 		
 		// 유저 이름 텍스트필드
 		JTextField idLabelTextField = new JTextField();
-		idLabelTextField.setSize(100,20);
-		idLabelTextField.setLocation(250,550);
-		idLabelTextField.setColumns(10);
-		add(idLabelTextField);
-		
+		idLabelTextField.setSize(100,25);
+		idLabelTextField.setLocation(400,470);
+		backgroundLabel.add(idLabelTextField);
 		
 		//시작버튼
-		JButton btnConnect = new JButton("ㅋ");
-		btnConnect.setSize(300,300);
-		btnConnect.setLocation(0,0);
-		add(btnConnect);
-		btnConnect.addActionListener(new ActionListener(){ // 내부클래스로 액션 이벤트 처리 클래스
+		JButton btnConnect = new JButton(gameStartButtonImg);
+		btnConnect.setSize(gameStartButtonImg.getIconWidth(),gameStartButtonImg.getIconHeight());
+		btnConnect.setLocation(width/2-gameStartButtonImg.getIconWidth()/2,520);
+		backgroundLabel.add(btnConnect);
+		btnConnect.addActionListener(new ActionListener(){ // 액션 이벤트 처리
 			public void actionPerformed(ActionEvent e) {
 				String username = userNameTextField.getText().trim();
 				String ip_addr = idLabelTextField.getText().trim();
@@ -89,5 +92,9 @@ public class ArcadeClient extends JFrame{
 				setVisible(false);
 			}
 		});
+		
+		repaint();
 	}
+	
+
 }

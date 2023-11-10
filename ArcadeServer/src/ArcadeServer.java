@@ -26,7 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-public class ArcadeServer extends JFrame{
+public class ArcadeServer extends JFrame {
 	private BufferedReader in = null;
 	private BufferedWriter out = null;
 	private ServerSocket listener = null; // 서버 소켓
@@ -45,6 +45,8 @@ public class ArcadeServer extends JFrame{
 	public static void main(String[] args) {
 		ArcadeServer server = new ArcadeServer();
 	}
+	
+
 	
 	public ArcadeServer() { //생성자
 		//ArcadeServer server = this;
@@ -105,51 +107,62 @@ public class ArcadeServer extends JFrame{
 	}
 	
 	class ServerThread extends Thread{
-	@Override
-	public void run() {
-		while (true) { // 사용자 접속을 계속해서 받기 위해 while문
-			try {
-				AppendText("클라이언트 접속을 대기중입니다.");
-				socket = listener.accept(); // accept가 일어나기 전까지는 무한 대기중
-				AppendText("새로운 참가자 from " + socket);
-				
-				// User 당 하나씩 Thread 생성
-				clientId++;
-				User new_user = new User(socket, clientId);
-				UserVec.add(new_user); // 새로운 참가자 배열에 추가
-				new_user.start(); // 만든 객체의 스레드 실행
-				AppendText("현재 동접자 수 :" + UserVec.size());
-				
-			} catch (IOException e) {
-				AppendText("accept() error");
-				// System.exit(0);
+		@Override
+		public void run() {
+			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
+				try {
+					AppendText("클라이언트 접속을 대기중입니다.");
+					socket = listener.accept(); // accept가 일어나기 전까지는 무한 대기중
+					AppendText("새로운 참가자 from " + socket);
+					
+					// User 당 하나씩 수신 할 수 있는 Thread 생성
+					clientId++;
+					ServerReceiver new_user = new ServerReceiver(socket, clientId);
+					UserVec.add(new_user); // 새로운 참가자 배열에 추가
+					new_user.start(); // 만든 객체의 스레드 실행
+					AppendText("현재 동접자 수 :" + UserVec.size());
+					
+				} catch (IOException e) {
+					AppendText("accept() error");
+					// System.exit(0);
+				}
 			}
 		}
-	}
+		
+		class ServerReceiver extends Thread {// User 스레드
+			private BufferedReader in;
+			private BufferedWriter out;
+			private Socket clientSocket;
+			private int clientId;
+			private Vector user_vc;
+			public String UserName = "";
+			public String UserStatus;
 	
-	class User extends Thread {// User 스레드
-		private BufferedReader in;
-		private BufferedWriter out;
-		private Socket clientSocket;
-		private int clientId;
-		private Vector user_vc;
-		public String UserName = "";
-		public String UserStatus;
-
-		public User(Socket s, int clientId) { 
-			this.clientSocket = s;
-			clientId = clientId;
-			this.user_vc = UserVec;
-			try {
-				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-				out.write("클라이언트 "+clientId+ " 접속");
-				out.flush();
-			} catch (Exception e) {
-				AppendText("userService error");
+			public ServerReceiver(Socket s, int clientId) { 
+				this.clientSocket = s;
+				clientId = clientId;
+				this.user_vc = UserVec;
+				try {
+					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+					out.write("클라이언트 "+clientId+ " 접속");
+					out.flush();
+				} catch (Exception e) {
+					AppendText("에러");
+				}
+			}
+			
+			@Override
+			public void run() {
+				String msg = null;
+				try {
+					msg = in.readLine();
+				} catch (Exception e) {
+					AppendText("에러");
+				}
+				AppendText(msg);
 			}
 		}
-	}
 
 	}
 }
