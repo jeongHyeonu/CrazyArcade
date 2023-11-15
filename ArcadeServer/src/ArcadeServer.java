@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -33,6 +34,18 @@ public class ArcadeServer extends JFrame {
 	private Socket socket = null; // 클라이언트 소켓 (클라.accept로 생성된 소켓)
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
 	
+	private boolean[] rooms = {false,false,false,false,false,false}; // 이용 가능한 방 저장
+	private String[] roomUserName = {"","","","","",""};
+	
+	// 대기실 방 내의 유저 정보
+	class UserInfoWaitRoom {
+		public String userName[] = {"-","-","-","-","-","-","-","-"};
+		public Boolean isUserEntered[] = {false,false,false,false,false,false,false,false};
+		public Boolean isReady[] = {true,false,false,false,false,false,false,false}; // 기본적으로, 방장은 준비상태 true
+	}
+	
+	private Vector<UserInfoWaitRoom> waitRoomList = new Vector<UserInfoWaitRoom>();
+	
 	private JPanel contentPane;
 	private JTextArea textArea;
 	private JTextField txtPortNumber;
@@ -49,6 +62,15 @@ public class ArcadeServer extends JFrame {
 
 	
 	public ArcadeServer() { //생성자
+		
+		// 대기방 생성
+		waitRoomList.add(new UserInfoWaitRoom());
+		waitRoomList.add(new UserInfoWaitRoom()); 
+		waitRoomList.add(new UserInfoWaitRoom()); 
+		waitRoomList.add(new UserInfoWaitRoom()); 
+		waitRoomList.add(new UserInfoWaitRoom()); 
+		waitRoomList.add(new UserInfoWaitRoom());
+		
 		//ArcadeServer server = this;
 		setTitle("서버 로그");
 		setLocation(0,0);
@@ -121,13 +143,13 @@ public class ArcadeServer extends JFrame {
 					UserVec.add(new_user); // 새로운 참가자 배열에 추가
 					new_user.start(); // 만든 객체의 스레드 실행
 					AppendText("현재 동접자 수 :" + UserVec.size());
-					
 				} catch (IOException e) {
 					AppendText("accept() error");
-					// System.exit(0);
 				}
 			}
 		}
+		
+
 		
 		class ServerReceiver extends Thread {// User 스레드
 			private BufferedReader in;
@@ -138,31 +160,160 @@ public class ArcadeServer extends JFrame {
 			public String UserName = "";
 			public String UserStatus;
 	
-			public ServerReceiver(Socket s, int clientId) { 
+			public ServerReceiver(Socket s, int clientId) {
 				this.clientSocket = s;
-				clientId = clientId;
+				this.clientId = clientId;
 				this.user_vc = UserVec;
 				try {
-					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-					out.write("클라이언트 "+clientId+ " 접속");
-					out.flush();
+					in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+					out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 				} catch (Exception e) {
-					AppendText("에러");
+					AppendText("에?러");
+					Logout();
+				}
+			}
+			
+			public void SendToClient(String msg) {
+				try {
+					out.write(msg);
+					out.flush();
+				}catch (IOException e) {
+					AppendText("accept() error");
+					Logout();
 				}
 			}
 			
 			@Override
 			public void run() {
-				String msg = null;
-				try {
-					msg = in.readLine();
-				} catch (Exception e) {
-					AppendText("에러");
+
+				String message = null;
+				
+				int msgType = 0;
+				String msgContent = null;
+				String userId = null;
+				String userName = null;
+				
+				while(true) {
+					
+					try {
+						message = in.readLine();
+						if (message == null) {
+							break;
+						}
+					} catch (Exception e) {
+						Logout(); // 에러난 클라이언트는 제거
+						break;
+					}
+					// 클라이언트로부터 메세지를 얻어온다. 이때 메세지는 타입에 따라 다른 행동을 한다.
+					// 여기서 메세지는 아래 예시처럼 "//"으로 타입과 메세지를 구분한다.
+					// 1은 클라이언트가 서버에 접속한 경우,  -  "1/로그인했습니다"
+					// 2는 클라이언트가 채팅방에 메시지를 입력하는 경우,  -  "2/유저 1 : 안녕하세요"
+					System.out.println(message);
+					
+					msgType = Integer.parseInt(message.split("/")[0]);
+					userId = message.split("/")[1];
+					userName = message.split("/")[2];
+					msgContent = message.split("/")[3];
+						
+					switch(msgType) {
+					case 1:
+						AppendText("클라이언트 "+clientId+" "+userId+" "+userName+" "+" 로그인");
+						clientId++;
+						break;
+					case 2:
+						AppendText("클라이언트 "+clientId+" 채팅 : "+msgContent);
+						break;
+					case 3: // 클라이언트가 방 생성
+						if(rooms[Integer.parseInt(msgContent)]) return; // 방이 이미 만들어져있다면 실행 X
+						for (int i = 0; i < UserVec.size(); i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							rooms[Integer.parseInt(msgContent)] = true;
+							for(int j=0;j<rooms.length;j++) {
+								if(rooms[j]==true) 
+									user.SendToClient("1/"+userId+"/"+userName+"/"+j+"\n");
+							}
+						}
+						break;
+					case 4: // 클라이언트가 방 입장
+						if(!rooms[Integer.parseInt(msgContent)]) return; // 방이 만들어져있지 않다면 실행 X
+						for (int i = 0; i < UserVec.size(); i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							System.out.println(UserName);
+							user.SendToClient("1/"+userId+"/"+userName+"/"+msgContent+"\n");
+							rooms[Integer.parseInt(msgContent)] = true;
+							roomUserName[Integer.parseInt(msgContent)] = userName;
+						}
+						break;
+					case 5: // 클라이언트가 로비 입장 시, 열려있는 방이 있는지 검사 후 알림
+						for (int i = 0; i < UserVec.size(); i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							for(int j=0;j<rooms.length;j++)
+								if(rooms[j]==true) 
+									user.SendToClient("1/"+userId+"/"+roomUserName[j]+"/"+j+"\n");
+						}
+						break;
+					case 6: // 클라이언트가 대기방 입장 시, 방에 대한 정보를 저장하고 클라이언트에게 방 정보를 전달한다.
+						// 대기실 방에 유저가 없는 부분을 채운다
+						UserInfoWaitRoom targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); // 메세지를 보낼 대기실 방 타겟룸
+						for(int i=0;i<8;i++) {
+							if(targetRoom.userName[i].equals("-")) {
+								targetRoom.userName[i] = userName;
+								targetRoom.isUserEntered[i] = true;
+								break;
+							}
+						}
+						// 각 클라이언트에게 방 정보를 전달한다
+						for (int j = 0; j < UserVec.size(); j++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(j);
+							
+							// 보낼 방 정보들 담을 string
+							String msgContents = "";
+							// 보낼 유저 이름 정보
+							msgContents = String.join(",", targetRoom.userName);
+							msgContents += "/";
+							// 유저 레디 정보
+							for (int i = 0; i < targetRoom.isReady.length; i++) {
+								msgContents += Boolean.toString(targetRoom.isReady[i]) + ", ";
+					        }
+							
+							user.SendToClient("2/"+userId+"/"+userName+"/"+msgContent+"/"+msgContents+"\n");
+						}
+						break;
+					case 7: // 클라이언트가 준비 버튼 누를 시
+						UserInfoWaitRoom targetWaitRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); // 메세지를 보낼 대기실 방 타겟룸
+						targetWaitRoom.isReady[Integer.parseInt(message.split("/")[4])] = !targetWaitRoom.isReady[Integer.parseInt(message.split("/")[4])];
+						
+						// 모든 클라이언트에 해당 클라이언트가 준비/준비안됨 을 알림
+						for (int i = 0; i < UserVec.size(); i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							
+							// 보낼 방 정보들 담을 string
+							String contents = "";
+							// 보낼 유저 이름 정보
+							contents += String.join(",", targetWaitRoom.userName);
+							contents += "/";
+							// 유저 레디 정보
+							for (int j = 0; j < targetWaitRoom.isReady.length; j++) {
+								contents += Boolean.toString(targetWaitRoom.isReady[j]) + ", ";
+					        }
+							System.out.println(contents);
+							
+							user.SendToClient("3/"+"-"+"/"+userName+"/"+msgContent+"/"+contents+"\n");
+						}
+						break;
+					case 8: // 클라이언트가 시작 버튼 누를 시
+						break;
+					default:
+						break;
 				}
-				AppendText(msg);
 			}
 		}
-
+			
+			
+		public void Logout() {
+			String msg = "[클라이언트" + clientId + "]님이 퇴장 하였습니다.\n";
+			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
+			AppendText("사용자 " + "[클라이언트" + clientId + "] 퇴장. 현재 참가자 수 " + UserVec.size());
+		}
 	}
-}
+}}

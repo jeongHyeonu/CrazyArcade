@@ -1,0 +1,3 @@
+public enum MessageType {
+	Login, Logout, Chatting, MakeMap
+}

@@ -1,0 +1,9 @@
+public class MessageType {
+	
+	private MessageEnum type;
+	private String msg
+	
+	public MessageType(MessageEnum type, Object msg){
+		
+	}
+}

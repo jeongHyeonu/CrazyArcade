@@ -1,0 +1,3 @@
+public enum MessageEnum {
+	Login, Logout, Chatting, MakeMap
+}

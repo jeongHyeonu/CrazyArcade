@@ -86,9 +86,10 @@ public class ArcadeClient extends JFrame{
 		btnConnect.addActionListener(new ActionListener(){ // 액션 이벤트 처리
 			public void actionPerformed(ActionEvent e) {
 				String username = userNameTextField.getText().trim();
-				String ip_addr = idLabelTextField.getText().trim();
+				if(username.equals("")) username="guest";
+				String id = idLabelTextField.getText().trim();
 				
-				ClientLobby clientLobby = new ClientLobby(username, ip_addr);
+				ClientLobby clientLobby = new ClientLobby(username, id);
 				setVisible(false);
 			}
 		});

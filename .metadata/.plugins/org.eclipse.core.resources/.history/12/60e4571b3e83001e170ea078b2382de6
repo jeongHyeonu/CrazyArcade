@@ -1,0 +1,82 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Vector;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class ClientWaitingRoom extends JFrame {
+	
+	private ImageIcon BG = new ImageIcon("./WaitingRoomImages/waitRoomBG.png");
+	private ImageIcon backUI = new ImageIcon("./WaitingRoomImages/waitRoomUI.png");
+	
+	public Vector<ClientWaitingRoomUsers> waitUsers = new Vector<ClientWaitingRoomUsers>();
+	
+	public ClientWaitingRoom() {
+		super();
+		
+		setTitle("크레이지아케이드 - 대기방");
+		this.setSize(BG.getIconWidth(),BG.getIconHeight()+35);
+		this.setLocation(0,0);
+		setLayout(null);
+		setVisible(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// 배경
+		JLabel background = new JLabel(BG);
+		background.setLocation(0,0);
+		background.setSize(BG.getIconWidth(),BG.getIconHeight());
+		background.setVisible(true);
+		add(background);
+		
+		// 배경 위에 올라갈 UI
+		JLabel bgUI = new JLabel(backUI);
+		bgUI.setSize(backUI.getIconWidth(),backUI.getIconHeight());
+		bgUI.setLocation(10,20);
+		bgUI.setLayout(null);
+		background.add(bgUI);
+		
+		// 들어온 유저 목록 아이콘 및 벡터 저장
+		for(int i=0;i<8;i++) {
+			ClientWaitingRoomUsers user = new ClientWaitingRoomUsers(i);
+			waitUsers.add(user);
+			bgUI.add(user);
+		}
+		repaint();
+	}
+	
+	// 유저가 대기방 오픈하면
+	public void userOpenWaitingRoom(String username,String userId,int roomIndex,BufferedWriter out) {
+		// 서버로부터 방 정보를 읽어온다
+		
+		
+		// 빈 방을 찾고, 유저가 들어왔다고 정보를 보냄
+//		for(int i=0;i<8;i++) {
+//			if(waitUsers.elementAt(i).isUserEntered==false) {
+//				try {
+//					out.write("6/"+userId+"/"+username+"/"+roomIndex+"\n");
+//					out.flush();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//				waitUsers.elementAt(i).userEntered(username,userId,i);
+//				break;
+//			}
+//		}
+		represhWaitingRoom();
+		setVisible(true);
+	}
+	
+	// 대기방 새로고침, 유저가 대기방 오픈하거나 나가거나 레디버튼 누를때 호출
+	public void represhWaitingRoom() {
+		for(int i=0;i<waitUsers.size();i++) {
+			ClientWaitingRoomUsers target = waitUsers.elementAt(i);
+			System.out.println("target "+i+" : " +target.isUserEntered.toString());
+			if(!target.userName.equals("")) target.userEntered(target.userName,target.userID,i);
+			if(target.isReady) target.userReady();
+		}
+		repaint();
+	}
+}

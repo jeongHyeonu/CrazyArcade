@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="&#x09;&#x09;btnConnect.addActionListener(action);"/>
+		<item key="selection" value="&#x09;&#x09;&#x09;&#x09;case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="&#x09;&#x09;btnConnect.addActionListener(action);"/>
-			<item value="appendtext"/>
+			<item value="&#x09;&#x09;&#x09;&#x09;case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다"/>
+			<item value="&quot;6/&quot;"/>
+			<item value="target."/>
+			<item value="out"/>
+			<item value="WriteOne"/>
+			<item value="uservec"/>
+			<item value="Logout"/>
+			<item value="logout"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>
