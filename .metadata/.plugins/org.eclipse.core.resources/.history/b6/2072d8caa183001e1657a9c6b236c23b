@@ -1,0 +1,29 @@
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class ClientGamePlay extends JFrame {
+	private ImageIcon bg = new ImageIcon("./GamePlayImages/bg.png"); //배경화면
+	
+    private static ClientGamePlay instance = new ClientGamePlay();
+    public synchronized static ClientGamePlay getInstance() {
+        return instance;
+    }
+	
+	public ClientGamePlay() {
+		ClientLobby.getInstance().gameInstance = this;
+		
+		setTitle("크레이지아케이드 - 대기실");
+		setLocation(0,0);
+		setSize(bg.getIconWidth(),bg.getIconHeight());
+		setLayout(null);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// 배경
+		JLabel backgroundLabel = new JLabel(bg);
+		backgroundLabel.setSize(bg.getIconWidth(),bg.getIconHeight());
+		backgroundLabel.setLocation(0,0);
+		add(backgroundLabel);
+	}
+}

@@ -42,6 +42,7 @@ public class ArcadeServer extends JFrame {
 		public String userName[] = {"-","-","-","-","-","-","-","-"};
 		public Boolean isUserEntered[] = {false,false,false,false,false,false,false,false};
 		public Boolean isReady[] = {true,false,false,false,false,false,false,false}; // 기본적으로, 방장은 준비상태 true
+		public int clientId[] = {-1,-1,-1,-1,-1,-1,-1,-1}; // 클라이언트 아이디 저장
 	}
 	
 	private Vector<UserInfoWaitRoom> waitRoomList = new Vector<UserInfoWaitRoom>();
@@ -151,7 +152,7 @@ public class ArcadeServer extends JFrame {
 		
 
 		
-		class ServerReceiver extends Thread {// User 스레드
+		class ServerReceiver extends Thread { // 클라이언트가 보내는 정보를 받아올 리스너
 			private BufferedReader in;
 			private BufferedWriter out;
 			private Socket clientSocket;
@@ -163,6 +164,7 @@ public class ArcadeServer extends JFrame {
 			public ServerReceiver(Socket s, int clientId) {
 				this.clientSocket = s;
 				this.clientId = clientId;
+				System.out.println(clientId);
 				this.user_vc = UserVec;
 				try {
 					in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -214,6 +216,8 @@ public class ArcadeServer extends JFrame {
 					userId = message.split("/")[1];
 					userName = message.split("/")[2];
 					msgContent = message.split("/")[3];
+					// 이후 나머지 부가 정보가 있는 경우
+					// ( message.split("/")[4], message.split("/")[5] 같은 추가 정보를 필터링 해야 하는 경우 ) 추가적으로 switch/case 문에 작성할 것
 						
 					switch(msgType) {
 					case 1:
@@ -259,6 +263,7 @@ public class ArcadeServer extends JFrame {
 							if(targetRoom.userName[i].equals("-")) {
 								targetRoom.userName[i] = userName;
 								targetRoom.isUserEntered[i] = true;
+								targetRoom.clientId[i] = clientId;
 								break;
 							}
 						}
@@ -298,10 +303,23 @@ public class ArcadeServer extends JFrame {
 					        }
 							System.out.println(contents);
 							
-							user.SendToClient("3/"+"-"+"/"+userName+"/"+msgContent+"/"+contents+"\n");
+							user.SendToClient("3/"+userId+"/"+userName+"/"+msgContent+"/"+contents+"\n");
 						}
 						break;
 					case 8: // 클라이언트가 시작 버튼 누를 시
+						int userCounts = Integer.parseInt(message.split("/")[4]);
+						// 모든 유저가 준비 상태가 아니면, 실행하지 않는다
+						for(int i=0;i<userCounts;i++) {
+							if(waitRoomList.elementAt(Integer.parseInt(msgContent)).isReady[i]==false) return;
+						}
+						// 모든 클라이언트에게 해당 방에서 게임이 시작되었음을 알린다
+						// 이때, 방에 입장해 있는 클라이언트의 ID가 일치하는 클라이언트에게만 메세지를 보낸다
+						UserInfoWaitRoom _targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); 
+						for (int i = 0; i < UserVec.size(); i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("4/"+userId+"/"+userName+"/"+msgContent+"\n");
+						}
+						
 						break;
 					default:
 						break;

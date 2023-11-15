@@ -17,6 +17,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 public class ClientLobby extends JFrame {
+	public static ClientLobby instance = null;
+	public ClientGamePlay gameInstance = null;
+	
+	public static ClientLobby getInstance() { return instance; }
+	
 	private BufferedReader in;
 	private BufferedWriter out;
 	private Socket socket;
@@ -36,6 +41,7 @@ public class ClientLobby extends JFrame {
 	private ServerReceiver receiver;
 	
 	public ClientLobby(String username, String userId) {
+		this.instance = this;
 		this.username = username;
 		this.userId = userId;
 		
@@ -189,7 +195,7 @@ public class ClientLobby extends JFrame {
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userName = msg.split("/")[4].split(",")[i];
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).isReady = (msg.split("/")[5].split(", ")[i].equals("true"))?true:false;
 						
-						// 준비 상태인 경우 대기방 유저 상태 변경
+						// 대기방 유저 상태 변경 - 준비 상태인지 아닌지
 						if(roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).isReady) {
 							roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userReady(true);
 						}
@@ -197,7 +203,9 @@ public class ClientLobby extends JFrame {
 							roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userReady(false);
 						}
 					}
-					
+					break;
+				case 4: // 서버가 클라이언트에게 게임 시작 명령을 보내는 경우, 이를 처리한다
+					roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.gamePlay();
 					break;
 				default:
 					break;

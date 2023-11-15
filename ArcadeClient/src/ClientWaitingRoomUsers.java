@@ -73,7 +73,6 @@ public class ClientWaitingRoomUsers extends JLabel {
 		if(b==true) setIcon(readyUser);
 		else setIcon(enteredUser);
 	}
-	
-	
+
 
 }

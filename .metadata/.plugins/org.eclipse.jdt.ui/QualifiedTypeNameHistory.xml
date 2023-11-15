@@ -14,7 +14,6 @@
     <fullyQualifiedTypeName name="java.io.BufferedReader"/>
     <fullyQualifiedTypeName name="java.awt.Font"/>
     <fullyQualifiedTypeName name="java.awt.Color"/>
-    <fullyQualifiedTypeName name="javax.swing.JFrame"/>
     <fullyQualifiedTypeName name="javax.swing.JPanel"/>
     <fullyQualifiedTypeName name="java.util.Vector"/>
     <fullyQualifiedTypeName name="javax.swing.JLabel"/>
@@ -25,4 +24,5 @@
     <fullyQualifiedTypeName name="java.io.IOException"/>
     <fullyQualifiedTypeName name="java.util.Timer"/>
     <fullyQualifiedTypeName name="java.util.TimerTask"/>
+    <fullyQualifiedTypeName name="javax.swing.JFrame"/>
 </qualifiedTypeNameHistroy>

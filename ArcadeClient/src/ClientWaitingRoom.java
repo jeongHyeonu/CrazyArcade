@@ -128,7 +128,17 @@ public class ClientWaitingRoom extends JFrame {
 	public class StartFunc extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			
+			try {
+				// 서버로 어떤 클라이언트가 게임을 실행하는지 전송
+				// 유저 수를 세고, 서버로 전달한다. (서버에서는 준비한 유저 수와 비교해서 같으면 게임을 실행시킨다)
+				int userCount = 0;
+				for(int i=0;i<waitUsers.size();i++) if(waitUsers.elementAt(i).isUserEntered) userCount++;
+				out.write("8/"+userId+"/"+username+"/"+roomNumber+"/"+userCount+"\n");
+				out.flush();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 	
@@ -137,6 +147,7 @@ public class ClientWaitingRoom extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			try {
+				// 서버로 어떤 클라이언트가 준비 상태를 변경하는지 전송
 				out.write("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"\n");
 				out.flush();
 			} catch (IOException e1) {
@@ -144,5 +155,15 @@ public class ClientWaitingRoom extends JFrame {
 				e1.printStackTrace();
 			}
 		}
+	}
+	
+	// 게임 시작
+	public void gamePlay() {
+		// 서버에 방이 없어졌음을 알려야 하는데... 일단은 그건 제외하고 게임 실행
+		
+		// 대기방 지우고 게임플레이로 이동
+		// 이때, 게임플레이는 로비 인스턴스에서 생성하고 받도록 한다. 서버에서 메세지를 받는 receiver가 로비에 정의되어 있기 때문에, 서버에서 메세지 호출 시 활용을 위함
+		this.setVisible(false);
+		ClientLobby.getInstance().gameInstance = new ClientGamePlay();
 	}
 }
