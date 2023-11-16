@@ -56,24 +56,30 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		// 키 입력 가능하게끔
-        addKeyListener(this);
-        setFocusable(true);
-        
 		// 배경
 		JLabel backgroundLabel = new JLabel(bg);
 		backgroundLabel.setSize(bg.getIconWidth(),bg.getIconHeight());
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
 		
+		// 맵 세팅
+		for(int x=0;x<15;x++) {
+			for(int y=0;y<13;y++) {
+				JLabel block;
+				if(MapArray[y][x]==0) block = new JLabel(block1);
+				else block = new JLabel(block2);
+				block.setSize(block1.getIconWidth(),block1.getIconHeight());
+				block.setLocation(x*block1.getIconWidth(),y*block1.getIconHeight());
+				block.setVisible(true);
+				backgroundLabel.add(block);
+			}
+		}
 		
 		// 캐릭터
         characterLabel = new JLabel(dizini);
-        characterLabel.setSize(dizini.getIconWidth(),dizini.getIconHeight());
-        characterLabel.setVisible(true);
         backgroundLabel.add(characterLabel);
         
-        // 스레드를 시작하여 캐릭터를 움직이게 한다.
+        // 스레드를 시작하여 캐릭터를 움직이게 합니다.
         Thread movementThread = new Thread(() -> {
             while (true) {
                 characterLabel.setLocation(x, y);
@@ -107,7 +113,6 @@ public class ClientGamePlay extends JFrame implements KeyListener {
                 x += 10;
                 break;
         }
-        System.out.println("x : "+x+" / y : "+y);
     }
 
 	@Override

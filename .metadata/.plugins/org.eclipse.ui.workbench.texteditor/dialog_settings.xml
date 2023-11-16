@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="MapArray"/>
+		<item key="selection" value="keyPressed"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="keyPressed"/>
+			<item value="event"/>
+			<item value="movePlayer1Pressed"/>
+			<item value="netKeyPressed"/>
 			<item value="maparray"/>
 			<item value="visible"/>
 			<item value="&#x09;&#x09;&#x09;&#x09;case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다"/>
@@ -24,8 +28,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1369"/>
-		<item key="DIALOG_Y_ORIGIN" value="170"/>
+		<item key="DIALOG_X_ORIGIN" value="1511"/>
+		<item key="DIALOG_Y_ORIGIN" value="161"/>
 		<item key="DIALOG_WIDTH" value="369"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
 		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>

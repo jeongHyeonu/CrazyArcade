@@ -66,10 +66,21 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
 		
+		// 맵 세팅
+		for(int x=0;x<15;x++) {
+			for(int y=0;y<13;y++) {
+				JLabel block;
+				if(MapArray[y][x]==0) block = new JLabel(block1);
+				else block = new JLabel(block2);
+				block.setSize(block1.getIconWidth(),block1.getIconHeight());
+				block.setLocation(x*block1.getIconWidth(),y*block1.getIconHeight());
+				block.setVisible(true);
+				backgroundLabel.add(block);
+			}
+		}
 		
 		// 캐릭터
         characterLabel = new JLabel(dizini);
-        characterLabel.setSize(dizini.getIconWidth(),dizini.getIconHeight());
         characterLabel.setVisible(true);
         backgroundLabel.add(characterLabel);
         

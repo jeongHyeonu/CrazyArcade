@@ -66,10 +66,10 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
 		
+
 		
 		// 캐릭터
         characterLabel = new JLabel(dizini);
-        characterLabel.setSize(dizini.getIconWidth(),dizini.getIconHeight());
         characterLabel.setVisible(true);
         backgroundLabel.add(characterLabel);
         
