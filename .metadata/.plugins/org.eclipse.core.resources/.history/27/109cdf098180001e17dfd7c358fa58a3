@@ -1,9 +1,0 @@
-public class MessageClass {
-	
-	private MessageType type;
-	private String msg;
-	
-	public MessageClass(MessageType type, Object msg){
-		
-	}
-}

@@ -1,9 +1,0 @@
-public class MessageClass {
-	
-	private MessageEnum type;
-	private String msg
-	
-	public MessageClass(MessageEnum type, Object msg){
-		
-	}
-}
