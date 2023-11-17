@@ -35,12 +35,12 @@ public class ClientRoom extends JButton{
 		
 		setSize(roomImage.getIconWidth(),roomImage.getIconHeight());
 		
-		if(idx==0) setLocation(10+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*0);
-		if(idx==1) setLocation(10+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*0);
-		if(idx==2) setLocation(10+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*1);
-		if(idx==3) setLocation(10+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*1);
-		if(idx==4) setLocation(10+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*2);
-		if(idx==5) setLocation(10+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*2);
+		if(idx==0) setLocation(15+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*0);
+		if(idx==1) setLocation(20+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*0);
+		if(idx==2) setLocation(15+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*1);
+		if(idx==3) setLocation(20+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*1);
+		if(idx==4) setLocation(15+(roomImage.getIconWidth()+5)*0,40+(roomImage.getIconHeight()+5)*2);
+		if(idx==5) setLocation(20+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*2);
 		
 		addMouseListener(new MouseAdapter(){ // 액션 이벤트 처리	
 			@Override
@@ -75,11 +75,13 @@ public class ClientRoom extends JButton{
 	public void roomCreate(String userName) {
 		isCreated = true;
 		this.setIcon(waitRoom);
+		setLayout(null);
 		JLabel roomTitle = new JLabel(userName+" 님의 방");
 		roomTitle.setFont(new Font("Serif",Font.BOLD,11));
 		roomTitle.setForeground(Color.WHITE);
-		roomTitle.setLocation(150,8);
+		roomTitle.setBounds(100, 20, roomTitle.getPreferredSize().width, roomTitle.getPreferredSize().height);
 		add(roomTitle);
+		repaint();
 	}
 	
 

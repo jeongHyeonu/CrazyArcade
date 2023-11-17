@@ -61,13 +61,13 @@ public class ClientWaitingRoom extends JFrame {
 		StartFunc startFunc = new StartFunc();
 		startBtn.addMouseListener(startFunc);
 		startBtn.setSize(startButtonDisable.getIconWidth(),startButtonDisable.getIconHeight());
-		startBtn.setLocation(400,100);
+		startBtn.setLocation(527,490);
 		
 		readyBtn = new JButton(readyButton);
 		ReadyFunc readyFunc = new ReadyFunc();
 		readyBtn.addMouseListener(readyFunc);
 		readyBtn.setSize(readyButton.getIconWidth(),readyButton.getIconHeight());
-		readyBtn.setLocation(400,100);
+		readyBtn.setLocation(527,490);
 		
 		// 들어온 유저 목록 아이콘 및 벡터 저장
 		for(int i=0;i<8;i++) {

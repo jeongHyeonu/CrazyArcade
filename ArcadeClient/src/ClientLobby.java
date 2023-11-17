@@ -34,7 +34,7 @@ public class ClientLobby extends JFrame {
 	private ImageIcon chatBox = new ImageIcon("./LobbyImages/chatBox.png"); // 대화창 내부
 	private ImageIcon roomList = new ImageIcon("./LobbyImages/roomList.png"); // 방 리스트 패널
 	private int width = bg.getIconWidth();
-	private int height = bg.getIconHeight()+30;
+	private int height = bg.getIconHeight();
 	private JTextArea textArea;
 	
 	private Vector<ClientRoom> roomVector = new Vector<ClientRoom>();

@@ -31,7 +31,7 @@ public class ArcadeClient extends JFrame{
 	private ImageIcon gameStartButtonImg = new ImageIcon("./LoginImages/gameStartButton.png"); //게임 시작 버튼 이미지
 	
 	private int width = bg.getIconWidth();
-	private int height = bg.getIconHeight()+30;
+	private int height = bg.getIconHeight();
 	
 	public static void main(String[] args) {
 		ArcadeClient clientLogin = new ArcadeClient();

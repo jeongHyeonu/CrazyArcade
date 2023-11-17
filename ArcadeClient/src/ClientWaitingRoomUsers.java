@@ -58,7 +58,7 @@ public class ClientWaitingRoomUsers extends JLabel {
 		// 유저이름
 		JLabel name = new JLabel(username);
 		name.setSize(150,100);
-		name.setLocation(50,50);
+		name.setLocation(35,65);
 		add(name);
 		
 	}
