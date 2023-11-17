@@ -223,7 +223,9 @@ public class ArcadeServer extends JFrame {
 					switch(msgType) {
 					case 1:
 						AppendText("클라이언트 "+clientId+" "+userId+" "+userName+" "+" 로그인");
-						clientId++;
+						// 로그인한 유저의 클라이언트 아이디 전송
+						ServerReceiver u = (ServerReceiver) UserVec.elementAt(clientId-1);
+						u.SendToClient("0/-/-/" + (clientId-1) +"\n");
 						break;
 					case 2:
 						AppendText("클라이언트 "+clientId+" 채팅 : "+msgContent);
@@ -264,7 +266,7 @@ public class ArcadeServer extends JFrame {
 							if(targetRoom.userName[i].equals("-")) {
 								targetRoom.userName[i] = userName;
 								targetRoom.isUserEntered[i] = true;
-								targetRoom.clientId[i] = clientId;
+								targetRoom.clientId[i] = (clientId-1);
 								break;
 							}
 						}
@@ -316,8 +318,8 @@ public class ArcadeServer extends JFrame {
 						// 모든 클라이언트에게 해당 방에서 게임이 시작되었음을 알린다
 						// 이때, 방에 입장해 있는 클라이언트의 ID가 일치하는 클라이언트에게만 메세지를 보낸다
 						UserInfoWaitRoom _targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); 
-						for (int i = 0; i < UserVec.size(); i++) {
-							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+						for(int i=0;i<userCounts;i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(_targetRoom.clientId[i]);
 							user.SendToClient("4/"+userId+"/"+userName+"/"+msgContent+"\n");
 						}
 						

@@ -5,6 +5,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import Characers.CharacterFactory;
+import Characers.GameCharacter;
+
 public class ClientGamePlay extends JFrame implements KeyListener {
 	
 	private ImageIcon bg = new ImageIcon("./GamePlayImages/bg.png"); //배경화면
@@ -45,11 +48,11 @@ public class ClientGamePlay extends JFrame implements KeyListener {
     private int x = 50;
     private int y = 50;
     
-   	private ClientGamePlayer[] player = new ClientGamePlayer[8];
+   	private GameCharacter[] player = new GameCharacter[8];
     
     
 	public ClientGamePlay() {
-		setTitle("크레이지아케이드 - 대기실");
+		setTitle("크레이지아케이드 - 게임방");
 		setLocation(0,0);
 		setSize(bg.getIconWidth(),bg.getIconHeight());
 		setLayout(null);
@@ -66,6 +69,8 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
 		
+		// 캐릭터 생성
+		//GameCharacter c = new CharacterFactory.getCharacter("Dao",x,y);
 		
 		// 캐릭터
         characterLabel = new JLabel(dizini);

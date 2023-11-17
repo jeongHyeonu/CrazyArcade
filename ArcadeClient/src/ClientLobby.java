@@ -27,6 +27,7 @@ public class ClientLobby extends JFrame {
 	private Socket socket;
 	private String username;
 	private String userId;
+	private int clientId;
 	
 	private ImageIcon bg = new ImageIcon("./LobbyImages/LobbyBackground.png"); //배경화면
 	private ImageIcon chatPanel = new ImageIcon("./LobbyImages/chatingPanel.png"); // 대화창 패널
@@ -106,6 +107,8 @@ public class ClientLobby extends JFrame {
 		receiver.start();
 
 		try {
+			out.write("1/"+userId+"/"+username+"/-1/"+"\n");
+			out.flush();
 			out.write("5/"+userId+"/"+username+"/-1/"+"\n");
 			out.flush();
 		} catch (IOException e1) {
@@ -178,7 +181,12 @@ public class ClientLobby extends JFrame {
 				String userName = msg.split("/")[2];
 				String msgContent = msg.split("/")[3];
 				
+				System.out.println(msg);
+				
 				switch(msgType) {
+				case 0:
+					clientId = Integer.parseInt(msgContent);
+					break;
 				case 1: // 플레이어가 방 생성시, 서버에서 클라로 해당 방이 만들어졌음을 알린다
 					roomVector.elementAt(Integer.parseInt(msgContent)).roomCreate(userName);
 					break;
