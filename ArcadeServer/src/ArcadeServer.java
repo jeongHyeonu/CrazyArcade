@@ -161,6 +161,8 @@ public class ArcadeServer extends JFrame {
 			private Vector user_vc;
 			public String UserName = "";
 			public String UserStatus;
+			public int enteredRoom = -1; // 게임 시작 전 몇 번째 대기방에 입장한 상태인지 저장, -1이면 입장 안한거고, 그 이외 값이면 입장한것
+			public int roomIndex = -1; // 대기방에 몇 번째로 입장한 상태인지 저장, -1이면 입장 안한거고, 그 이외 값이면 입장한것
 	
 			public ServerReceiver(Socket s, int clientId) {
 				this.clientSocket = s;
@@ -224,7 +226,7 @@ public class ArcadeServer extends JFrame {
 					case 1:
 						AppendText("클라이언트 "+clientId+" "+userId+" "+userName+" "+" 로그인");
 						// 로그인한 유저의 클라이언트 아이디 전송
-						ServerReceiver u = (ServerReceiver) UserVec.elementAt(clientId-1);
+						ServerReceiver u = (ServerReceiver) UserVec.elementAt(UserVec.size()-1);
 						u.SendToClient("0/-/-/" + (clientId-1) +"\n");
 						break;
 					case 2:
@@ -262,11 +264,14 @@ public class ArcadeServer extends JFrame {
 					case 6: // 클라이언트가 대기방 입장 시, 방에 대한 정보를 저장하고 클라이언트에게 방 정보를 전달한다.
 						// 대기실 방에 유저가 없는 부분을 채운다
 						UserInfoWaitRoom targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); // 메세지를 보낼 대기실 방 타겟룸
+						int enteredRoomIndex = 0;
+						
 						for(int i=0;i<8;i++) {
 							if(targetRoom.userName[i].equals("-")) {
 								targetRoom.userName[i] = userName;
 								targetRoom.isUserEntered[i] = true;
 								targetRoom.clientId[i] = (clientId-1);
+								enteredRoomIndex = i;
 								break;
 							}
 						}
@@ -284,6 +289,11 @@ public class ArcadeServer extends JFrame {
 								msgContents += Boolean.toString(targetRoom.isReady[i]) + ", ";
 					        }
 							
+							// 해당 클라이언트가 몇 번째 대기방에 입장했는지 저장
+							user.enteredRoom = Integer.parseInt(msgContent);
+							user.roomIndex = enteredRoomIndex;
+							
+							// 메세지 전송
 							user.SendToClient("2/"+userId+"/"+userName+"/"+msgContent+"/"+msgContents+"\n");
 						}
 						break;
@@ -304,7 +314,6 @@ public class ArcadeServer extends JFrame {
 							for (int j = 0; j < targetWaitRoom.isReady.length; j++) {
 								contents += Boolean.toString(targetWaitRoom.isReady[j]) + ", ";
 					        }
-							System.out.println(contents);
 							
 							user.SendToClient("3/"+userId+"/"+userName+"/"+msgContent+"/"+contents+"\n");
 						}
@@ -334,7 +343,34 @@ public class ArcadeServer extends JFrame {
 		public void Logout() {
 			String msg = "[클라이언트" + clientId + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
-			AppendText("사용자 " + "[클라이언트" + clientId + "] 퇴장. 현재 참가자 수 " + UserVec.size());
+			if(this.enteredRoom!=-1) { // 만약 대기방에 입장한 상태면, 그 대기방 정보 갱신 및 전송
+				UserInfoWaitRoom _targetRoom = waitRoomList.elementAt(enteredRoom);
+				// 만약 유저가 대기방 첫번째 손님이었으면 방 없앤다
+				if(roomIndex==0) rooms[enteredRoom]=false;
+				
+				_targetRoom.isReady[this.roomIndex] = false;
+				_targetRoom.isUserEntered[this.roomIndex] = false;
+				_targetRoom.userName[this.roomIndex] = "-";
+				_targetRoom.clientId[this.roomIndex] = -1;
+				
+				// 모든 클라이언트에 알림
+				for (int i = 0; i < UserVec.size(); i++) {
+					ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+					
+					// 보낼 방 정보들 담을 string
+					String contents = "";
+					// 보낼 유저 이름 정보
+					contents += String.join(",", _targetRoom.userName);
+					contents += "/";
+					// 유저 레디 정보
+					for (int j = 0; j < _targetRoom.isReady.length; j++) {
+						contents += Boolean.toString(_targetRoom.isReady[j]) + ", ";
+			        }
+					
+					user.SendToClient("3/-"+"/"+user.UserName+"/"+roomIndex+"/"+contents+"\n");
+				}
+			}
+			AppendText("사용자 " + "[클라이언트" + (clientId-1) + "] 퇴장. 현재 참가자 수 " + UserVec.size());
 		}
 	}
 }}
