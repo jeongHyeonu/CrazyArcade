@@ -157,7 +157,7 @@ public class ArcadeServer extends JFrame {
 			private BufferedReader in;
 			private BufferedWriter out;
 			private Socket clientSocket;
-			private int clientId;
+			public int clientId;
 			private Vector user_vc;
 			public String UserName = "";
 			public String UserStatus;
@@ -227,7 +227,7 @@ public class ArcadeServer extends JFrame {
 						AppendText("클라이언트 "+clientId+" "+userId+" "+userName+" "+" 로그인");
 						// 로그인한 유저의 클라이언트 아이디 전송
 						ServerReceiver u = (ServerReceiver) UserVec.elementAt(UserVec.size()-1);
-						u.SendToClient("0/-/-/" + (clientId-1) +"\n");
+						u.SendToClient("0/-/-/" + (u.clientId-1) +"\n");
 						break;
 					case 2:
 						AppendText("클라이언트 "+clientId+" 채팅 : "+msgContent);
@@ -324,13 +324,29 @@ public class ArcadeServer extends JFrame {
 						for(int i=0;i<userCounts;i++) {
 							if(waitRoomList.elementAt(Integer.parseInt(msgContent)).isReady[i]==false) return;
 						}
+
+						// 대기방 타겟
+						UserInfoWaitRoom _targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent));
+
 						// 모든 클라이언트에게 해당 방에서 게임이 시작되었음을 알린다
-						// 이때, 방에 입장해 있는 클라이언트의 ID가 일치하는 클라이언트에게만 메세지를 보낸다
-						UserInfoWaitRoom _targetRoom = waitRoomList.elementAt(Integer.parseInt(msgContent)); 
-						for(int i=0;i<userCounts;i++) {
-							ServerReceiver user = (ServerReceiver) UserVec.elementAt(_targetRoom.clientId[i]);
-							user.SendToClient("4/"+userId+"/"+userName+"/"+msgContent+"\n");
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							
+							for(int j=0;j<userCounts;j++) {
+								user.SendToClient("4/"+userId+"/"+userName+"/"+(Integer.parseInt(msgContent))+"/"+_targetRoom.clientId[j]+"\n");
+							}
+							
 						}
+						
+						// 해당 방 초기화
+						rooms[Integer.parseInt(msgContent)] = false;
+						for(int i=0;i<8;i++) {
+							_targetRoom.isReady[roomIndex] = false;
+							_targetRoom.isUserEntered[roomIndex] = false;
+							_targetRoom.userName[roomIndex] = "-";
+							_targetRoom.clientId[roomIndex] = -1;
+						}
+						_targetRoom.isReady[0] = true; // 방장은 레디 상태로
 						
 						break;
 					default:
@@ -348,10 +364,12 @@ public class ArcadeServer extends JFrame {
 				// 만약 유저가 대기방 첫번째 손님이었으면 방 없앤다
 				if(roomIndex==0) rooms[enteredRoom]=false;
 				
-				_targetRoom.isReady[this.roomIndex] = false;
-				_targetRoom.isUserEntered[this.roomIndex] = false;
-				_targetRoom.userName[this.roomIndex] = "-";
-				_targetRoom.clientId[this.roomIndex] = -1;
+				_targetRoom.isReady[roomIndex] = false;
+				_targetRoom.isUserEntered[roomIndex] = false;
+				_targetRoom.userName[roomIndex] = "-";
+				_targetRoom.clientId[roomIndex] = -1;
+				
+				_targetRoom.isReady[0] = true; // 방장은 레디 상태로
 				
 				// 모든 클라이언트에 알림
 				for (int i = 0; i < UserVec.size(); i++) {

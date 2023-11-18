@@ -1,4 +1,4 @@
-package Characers;
+package Characters;
 
 import java.io.BufferedWriter;
 

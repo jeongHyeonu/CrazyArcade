@@ -163,7 +163,7 @@ public class ClientWaitingRoom extends JFrame {
 		
 		// 대기방 지우고 게임플레이로 이동
 		// 이때, 게임플레이는 로비 인스턴스에서 생성하고 받도록 한다. 서버에서 메세지를 받는 receiver가 로비에 정의되어 있기 때문에, 서버에서 메세지 호출 시 활용을 위함
-		this.setVisible(false);
+		setVisible(false);
 		ClientLobby.getInstance().gameInstance = new ClientGamePlay();
 	}
 }

@@ -1,12 +1,15 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedWriter;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.xml.stream.events.Characters;
 
-import Characers.CharacterFactory;
-import Characers.GameCharacter;
+import Characters.CharacterFactory;
+import Characters.GameCharacter;
 
 public class ClientGamePlay extends JFrame implements KeyListener {
 	
@@ -27,6 +30,10 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	
 	private ImageIcon dizini = new ImageIcon("./GamePlayImages/Charactor/dizini_front.png");
 	
+	// 캐릭터 만든 후, 담는 배열
+	private Vector<GameCharacter> characterVector = new Vector<GameCharacter>();
+	
+	
     int[][] MapArray = { //맵
 		   {0, 3, 2, 3, 2, 8, 0, 0, 1, 8, 5, 2, 5, 0, 5}, 
 		   {0, 4, 1, 4, 1, 7, 1, 0, 0, 7, 2, 3, 0, 0, 1}, 
@@ -45,10 +52,9 @@ public class ClientGamePlay extends JFrame implements KeyListener {
     
     // 캐릭터
     private JLabel characterLabel;
-    private int x = 50;
-    private int y = 50;
-    
-   	private GameCharacter[] player = new GameCharacter[8];
+
+
+	private GameCharacter clientCharacter;
     
     
 	public ClientGamePlay() {
@@ -69,19 +75,26 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
 		
-		// 캐릭터 생성
-		//GameCharacter c = new CharacterFactory.getCharacter("Dao",x,y);
 		
-		// 캐릭터
+		// 캐릭터 생성
+	    int x = 50;
+	    int y = 50;
+		String userName = ClientLobby.instance.username;
+		int clientId = ClientLobby.instance.clientId;
+		BufferedWriter out = ClientLobby.instance.out;
+		GameCharacter c = CharacterFactory.getCharacter("Dao",x,y,clientId,userName,out);
+		clientCharacter = c;
+		characterVector.add(c);
+		// 캐릭터 라벨
         characterLabel = new JLabel(dizini);
-        characterLabel.setSize(dizini.getIconWidth(),dizini.getIconHeight());
+        characterLabel.setSize(c.x,c.y);
         characterLabel.setVisible(true);
         backgroundLabel.add(characterLabel);
         
         // 스레드를 시작하여 캐릭터를 움직이게 한다.
         Thread movementThread = new Thread(() -> {
             while (true) {
-                characterLabel.setLocation(x, y);
+                characterLabel.setLocation(clientCharacter.x, clientCharacter.y);
                 try {
                     Thread.sleep(50);  // 50밀리초마다 쉬면서 이동
                 } catch (InterruptedException e) {
@@ -92,12 +105,12 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         movementThread.start();
         
         // 타일 및 블럭 배치
-        for(int x=0;x<15;x++) {
-        	for(int y=0;y<13;y++) {
+        for(int row=0;x<15;x++) {
+        	for(int column=0;y<13;y++) {
         		JLabel block = new JLabel();
-        		block.setLocation(block1.getIconWidth()*x,block1.getIconHeight()*y);
+        		block.setLocation(block1.getIconWidth()*row,block1.getIconHeight()*column);
         		block.setSize(block1.getIconWidth(),block1.getIconHeight());
-        		if(MapArray[y][x]==0) block.setIcon(block1);
+        		if(MapArray[column][row]==0) block.setIcon(block1);
         		else block.setIcon(block2);
         		backgroundLabel.add(block);
         	}
@@ -115,19 +128,18 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 
         switch (keyCode) {
             case KeyEvent.VK_UP:
-                y -= 10;
+                clientCharacter.y -= 10;
                 break;
             case KeyEvent.VK_DOWN:
-                y += 10;
+            	clientCharacter.y += 10;
                 break;
             case KeyEvent.VK_LEFT:
-                x -= 10;
+            	clientCharacter.x -= 10;
                 break;
             case KeyEvent.VK_RIGHT:
-                x += 10;
+            	clientCharacter.x += 10;
                 break;
         }
-        System.out.println("x : "+x+" / y : "+y);
     }
 
 	@Override

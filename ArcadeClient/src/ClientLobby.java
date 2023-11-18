@@ -23,11 +23,11 @@ public class ClientLobby extends JFrame {
 	public static ClientLobby getInstance() { return instance; }
 	
 	private BufferedReader in;
-	private BufferedWriter out;
+	public BufferedWriter out;
 	private Socket socket;
-	private String username;
-	private String userId;
-	private int clientId;
+	public String username;
+	public String userId;
+	public int clientId;
 	
 	private ImageIcon bg = new ImageIcon("./LobbyImages/LobbyBackground.png"); //배경화면
 	private ImageIcon chatPanel = new ImageIcon("./LobbyImages/chatingPanel.png"); // 대화창 패널
@@ -213,7 +213,9 @@ public class ClientLobby extends JFrame {
 					}
 					break;
 				case 4: // 서버가 클라이언트에게 게임 시작 명령을 보내는 경우, 이를 처리한다
-					roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.gamePlay();
+					// 클라이언트 id가 일치하는 경우, 게임 시작
+					if(Integer.parseInt(msg.split("/")[4])==clientId)
+						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.gamePlay();
 					break;
 				default:
 					break;
