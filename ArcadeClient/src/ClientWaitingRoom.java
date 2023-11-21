@@ -17,6 +17,11 @@ public class ClientWaitingRoom extends JFrame {
 	private ImageIcon startButtonDisable = new ImageIcon("./WaitingRoomImages/startButtonDisable.png");
 	private ImageIcon startButtonAble = new ImageIcon("./WaitingRoomImages/startButtonAble.png");
 	private ImageIcon readyButton = new ImageIcon("./WaitingRoomImages/readyButton.png");
+	private ImageIcon selectDaoButton = new ImageIcon("./WaitingRoomImages/characterDao.png");
+	private ImageIcon selectDiziniButton = new ImageIcon("./WaitingRoomImages/characterDizini.png");
+	private ImageIcon selectVillageMapButton = new ImageIcon("./WaitingRoomImages/mapVillage.png");
+	private ImageIcon comingsoonIcon = new ImageIcon("./WaitingRoomImages/mapComingsoon.png");
+	private ImageIcon checkIcon = new ImageIcon("./WaitingRoomImages/check.png");
 	
 	private int roomNumber; // 현재 대기방 번호, 0~5
 	private int clientUserIndex; // 현재 대기방에 입장한 유저의 번호, 0~7
@@ -28,6 +33,13 @@ public class ClientWaitingRoom extends JFrame {
 	private JButton startBtn;
 	private JButton readyBtn;
 	private JLabel bgUI;
+	
+	private JButton selectDao;
+	private JButton selectDizini;
+	private JButton selectVillageMap;
+	private JLabel comingsoon;
+	private JLabel check;
+	
 	
 	public Vector<ClientWaitingRoomUsers> waitUsers = new Vector<ClientWaitingRoomUsers>();
 	
@@ -54,6 +66,43 @@ public class ClientWaitingRoom extends JFrame {
 		bgUI.setLocation(10,20);
 		bgUI.setLayout(null);
 		background.add(bgUI);
+		
+		// 캐릭터 선택 UI
+		// 다오
+		selectDao = new JButton(selectDaoButton);
+		SelectCharFunc seletDaoFunc = new SelectCharFunc();
+		selectDao.addMouseListener(seletDaoFunc);
+		selectDao.setSize(selectDaoButton.getIconWidth(),selectDaoButton.getIconHeight());
+		selectDao.setLocation(507,112);
+		bgUI.add(selectDao);
+		selectDao.setVisible(true);
+		
+		// 디지니
+		selectDizini = new JButton(selectDiziniButton);
+		SelectCharFunc seletDiziniFunc = new SelectCharFunc();
+		selectDizini.addMouseListener(seletDiziniFunc);
+		selectDizini.setSize(selectDiziniButton.getIconWidth(),selectDiziniButton.getIconHeight());
+		selectDizini.setLocation(631,112);
+		bgUI.add(selectDizini);
+		selectDizini.setVisible(true);
+		
+		// 맵선택 UI
+		// 빌리지
+		selectVillageMap = new JButton(selectVillageMapButton);
+		SelectMapFunc seletVillageFunc = new SelectMapFunc();
+		selectVillageMap.addMouseListener(seletVillageFunc);
+		selectVillageMap.setSize(selectVillageMapButton.getIconWidth(),selectVillageMapButton.getIconHeight());
+		selectVillageMap.setLocation(509,314);
+		bgUI.add(selectVillageMap);
+		selectVillageMap.setVisible(true);
+		
+		// coming soon
+		comingsoon = new JLabel(comingsoonIcon);
+		comingsoon.setSize(comingsoonIcon.getIconWidth(),comingsoonIcon.getIconHeight());
+		comingsoon.setLocation(633,314);
+		comingsoon.setLayout(null);
+		bgUI.add(comingsoon);
+		
 		
 		// 시작 버튼 및 준비 버튼
 		// 방장에게는 시작 버튼이, 다른 유저에겐 준비 버튼이 보인다
@@ -86,7 +135,7 @@ public class ClientWaitingRoom extends JFrame {
 		this.out = out;
 		
 		// 새로고침 뒤 창을 보이게 한다
-		represhWaitingRoom();
+		refreshWaitingRoom();
 		// 유저가 몇 번째로 입장했는지 저장
 		for(int i=0;i<waitUsers.size();i++) {
 			if(!waitUsers.elementAt(i).isUserEntered) {
@@ -111,7 +160,7 @@ public class ClientWaitingRoom extends JFrame {
 	}
 	
 	// 대기방 새로고침, 유저가 대기방 오픈하거나 나가거나 레디버튼 누를때 호출
-	public void represhWaitingRoom() {
+	public void refreshWaitingRoom() {
 		for(int i=0;i<waitUsers.size();i++) {
 			ClientWaitingRoomUsers target = waitUsers.elementAt(i);
 			if(!target.userName.equals("-")) target.userEntered(target.userName,target.userID,i);
@@ -121,6 +170,33 @@ public class ClientWaitingRoom extends JFrame {
 	}
 	
 	public void setRoomIndex(int idx) {roomNumber = idx;}
+	
+	
+	public class SelectCharFunc extends MouseAdapter{
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getSource() == selectDao) {
+	            System.out.println("Dao Selected");
+	            
+	        } else if (e.getSource() == selectDizini) {
+	            System.out.println("Dizini Selected");
+	            
+	        }
+		}
+		
+	}
+	
+	public class SelectMapFunc extends MouseAdapter{
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getSource() == selectVillageMap) {
+	            System.out.println("Village Map Selected");
+ 
+	        } 
+		}
+		
+	}
+	
 	
 	// 어느 waitRoomUser가 버튼을 눌렀는지 체크해야 되서, 여기서 시작/준비 버튼 이벤트 정의
 	
