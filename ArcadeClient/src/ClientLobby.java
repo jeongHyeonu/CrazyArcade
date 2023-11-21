@@ -195,7 +195,7 @@ public class ClientLobby extends JFrame {
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userName = msg.split("/")[4].split(",")[i];
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).isReady = (msg.split("/")[5].split(",")[i].equals("true"))?true:false;
 					}
-					roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.represhWaitingRoom();
+					roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.refreshWaitingRoom();
 					break;
 				case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다
 					System.out.println(msg);
