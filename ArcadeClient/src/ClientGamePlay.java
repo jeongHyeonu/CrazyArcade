@@ -82,19 +82,19 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		String userName = ClientLobby.instance.username;
 		int clientId = ClientLobby.instance.clientId;
 		BufferedWriter out = ClientLobby.instance.out;
-		GameCharacter c = CharacterFactory.getCharacter("Dao",x,y,clientId,userName,out);
+		GameCharacter c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
 		clientCharacter = c;
 		characterVector.add(c);
+		
 		// 캐릭터 라벨
-        characterLabel = new JLabel(dizini);
-        characterLabel.setSize(c.x,c.y);
-        characterLabel.setVisible(true);
-        backgroundLabel.add(characterLabel);
+		clientCharacter.setSize(60,70);
+		clientCharacter.setVisible(true);
+        backgroundLabel.add(c);
         
         // 스레드를 시작하여 캐릭터를 움직이게 한다.
         Thread movementThread = new Thread(() -> {
             while (true) {
-                characterLabel.setLocation(clientCharacter.x, clientCharacter.y);
+                c.setLocation(clientCharacter.x, clientCharacter.y);
                 try {
                     Thread.sleep(50);  // 50밀리초마다 쉬면서 이동
                 } catch (InterruptedException e) {

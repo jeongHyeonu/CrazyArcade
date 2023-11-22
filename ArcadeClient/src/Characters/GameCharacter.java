@@ -1,8 +1,11 @@
 package Characters;
 
+import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 
-public abstract class GameCharacter {
+import javax.swing.JLabel;
+
+public abstract class GameCharacter extends JLabel{
 	// 클라이언트 속성
 	public int clientId;
 	public String username;
