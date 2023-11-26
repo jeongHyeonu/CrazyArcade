@@ -12,11 +12,6 @@ public class Mos extends GameCharacter {
 		this.out = out;
 	}
 	
-	@Override
-	public void move() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void attack() {

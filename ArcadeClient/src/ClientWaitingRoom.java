@@ -25,7 +25,7 @@ public class ClientWaitingRoom extends JFrame {
 	
 	private int roomNumber; // 현재 대기방 번호, 0~5
 	private int clientUserIndex; // 현재 대기방에 입장한 유저의 번호, 0~7
-	private int userCount; // 현재 대기방에 입장한 유저 수
+	public int userCount=1; // 현재 대기방에 입장한 유저 수
 	private String username;
 	private String userId;
 	private BufferedWriter out;
@@ -133,6 +133,7 @@ public class ClientWaitingRoom extends JFrame {
 		this.username = username;
 		this.userId = userId;
 		this.out = out;
+		this.userCount++;
 		
 		// 새로고침 뒤 창을 보이게 한다
 		refreshWaitingRoom();
@@ -161,11 +162,18 @@ public class ClientWaitingRoom extends JFrame {
 	
 	// 대기방 새로고침, 유저가 대기방 오픈하거나 나가거나 레디버튼 누를때 호출
 	public void refreshWaitingRoom() {
+		int readyCount = 0;
 		for(int i=0;i<waitUsers.size();i++) {
 			ClientWaitingRoomUsers target = waitUsers.elementAt(i);
 			if(!target.userName.equals("-")) target.userEntered(target.userName,target.userID,i);
-			if(target.isReady) target.userReady(true);
+			if(target.isReady) {
+				target.userReady(true);
+				readyCount++;
+			}
 		}
+		if(userCount==readyCount)SetStartBtnAble();
+		else SetStartBtnDisable();
+		
 		repaint();
 	}
 	
@@ -195,6 +203,19 @@ public class ClientWaitingRoom extends JFrame {
 	        } 
 		}
 		
+	}
+	
+	// 시작 버튼 활성화
+	public void SetStartBtnAble() {
+		if(clientUserIndex==0)
+			startBtn.setIcon(startButtonAble);
+		repaint();
+	}
+	// 시작 버튼 비활성화	
+	public void SetStartBtnDisable() {
+		if(clientUserIndex==0)
+			startBtn.setIcon(startButtonDisable);
+		repaint();
 	}
 	
 	

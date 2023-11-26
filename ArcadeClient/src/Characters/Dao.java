@@ -11,13 +11,6 @@ public class Dao extends GameCharacter {
 		this.username = userName;
 		this.out = out;
 	}
-	
-	
-	@Override
-	public void move() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void attack() {

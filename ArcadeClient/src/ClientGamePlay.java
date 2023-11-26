@@ -1,6 +1,7 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -10,6 +11,7 @@ import javax.xml.stream.events.Characters;
 
 import Characters.CharacterFactory;
 import Characters.GameCharacter;
+import Characters.GameCharacter.Direction;
 
 public class ClientGamePlay extends JFrame implements KeyListener {
 	
@@ -31,8 +33,9 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	private ImageIcon dizini = new ImageIcon("./GamePlayImages/Charactor/dizini_front.png");
 	
 	// 캐릭터 만든 후, 담는 배열
-	private Vector<GameCharacter> characterVector = new Vector<GameCharacter>();
-	
+	public Vector<GameCharacter> characterVector = new Vector<GameCharacter>();
+	public int userCounts;
+	JLabel backgroundLabel = new JLabel(bg);
 	
     int[][] MapArray = { //맵
 		   {0, 3, 2, 3, 2, 8, 0, 0, 1, 8, 5, 2, 5, 0, 5}, 
@@ -65,36 +68,27 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		// 로비에서 서버의 응답을 수신하기 때문에, 로비의 게임플레이 인스턴스를 설정해준다 
+		ClientLobby.instance.gameInstance = this;
+		
 		// 키 입력 가능하게끔
         addKeyListener(this);
         setFocusable(true);
         
 		// 배경
-		JLabel backgroundLabel = new JLabel(bg);
 		backgroundLabel.setSize(bg.getIconWidth(),bg.getIconHeight());
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
-		
-		
-		// 캐릭터 생성
-	    int x = 50;
-	    int y = 50;
-		String userName = ClientLobby.instance.username;
-		int clientId = ClientLobby.instance.clientId;
-		BufferedWriter out = ClientLobby.instance.out;
-		GameCharacter c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
-		clientCharacter = c;
-		characterVector.add(c);
-		
-		// 캐릭터 라벨
-		clientCharacter.setSize(60,70);
-		clientCharacter.setVisible(true);
-        backgroundLabel.add(c);
+        
+        
         
         // 스레드를 시작하여 캐릭터를 움직이게 한다.
         Thread movementThread = new Thread(() -> {
             while (true) {
-                c.setLocation(clientCharacter.x, clientCharacter.y);
+            	for(int i=0;i<characterVector.size();i++) {
+            		GameCharacter target = characterVector.elementAt(i);
+            		target.setLocation(target.x, target.y);
+            	}
                 try {
                     Thread.sleep(50);  // 50밀리초마다 쉬면서 이동
                 } catch (InterruptedException e) {
@@ -104,21 +98,51 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         });
         movementThread.start();
         
-        // 타일 및 블럭 배치
-        for(int row=0;x<15;x++) {
-        	for(int column=0;y<13;y++) {
-        		JLabel block = new JLabel();
-        		block.setLocation(block1.getIconWidth()*row,block1.getIconHeight()*column);
-        		block.setSize(block1.getIconWidth(),block1.getIconHeight());
-        		if(MapArray[column][row]==0) block.setIcon(block1);
-        		else block.setIcon(block2);
-        		backgroundLabel.add(block);
-        	}
-        }
+//        // 타일 및 블럭 배치
+//        for(int row=0;row<15;row++) {
+//        	for(int column=0;column<13;column++) {
+//        		JLabel block = new JLabel();
+//        		block.setLocation(block1.getIconWidth()*row,block1.getIconHeight()*column);
+//        		block.setSize(block1.getIconWidth(),block1.getIconHeight());
+//        		if(MapArray[column][row]==0) block.setIcon(block1);
+//        		else block.setIcon(block2);
+//        		backgroundLabel.add(block);
+//        	}
+//        }
         
         
         
 		repaint();
+	}
+	
+	public void CharacterCreate(int userCounts,String xList, String yList) {
+		this.userCounts = userCounts;
+		for(int i=0;i<userCounts;i++) {
+			// 캐릭터 생성
+		    int x = Integer.parseInt(xList.split(",")[i]);
+		    int y = Integer.parseInt(yList.split(",")[i]);
+			String userName = ClientLobby.instance.username;
+			int clientId = ClientLobby.instance.clientId;
+			BufferedWriter out = ClientLobby.instance.out;
+			GameCharacter c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
+			c.setSize(60,70);
+			c.setVisible(true);
+			characterVector.add(c);
+			backgroundLabel.add(c);
+		}
+		int clientId = ClientLobby.instance.clientId;
+		clientCharacter = characterVector.elementAt(clientId);
+	}
+	
+	public void UpdateCharacterVector(String xList, String yList) {
+		String[] clientX = xList.split(",");
+		String[] clientY = yList.split(",");
+		for(int i=0;i<userCounts;i++) {
+			characterVector.elementAt(i).x = Integer.parseInt(clientX[i]) ;
+			characterVector.elementAt(i).y = Integer.parseInt(clientY[i]) ;
+			characterVector.elementAt(i).setLocation(characterVector.elementAt(i).x,characterVector.elementAt(i).y);
+			characterVector.elementAt(i).repaint();
+		}
 	}
 	
     @Override
@@ -129,22 +153,38 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         switch (keyCode) {
             case KeyEvent.VK_UP:
                 clientCharacter.y -= 10;
+                clientCharacter.move(Direction.up);
                 break;
             case KeyEvent.VK_DOWN:
             	clientCharacter.y += 10;
+            	clientCharacter.move(Direction.down);
                 break;
             case KeyEvent.VK_LEFT:
             	clientCharacter.x -= 10;
+            	clientCharacter.move(Direction.left);
                 break;
             case KeyEvent.VK_RIGHT:
             	clientCharacter.x += 10;
+            	clientCharacter.move(Direction.right);
                 break;
         }
+        
+        // 서버로 캐릭터 이동 전송
+        try {
+			clientCharacter.out.write("9/"+"_"+"/"+clientCharacter.username+"/"+clientCharacter.clientId+"/"+clientCharacter.x+"/"+clientCharacter.y+"\n");
+			clientCharacter.out.flush();
+        } catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        //out.write
     }
 
 	@Override
 	public void keyTyped(KeyEvent e) {}
 
 	@Override
-	public void keyReleased(KeyEvent e) {}
+	public void keyReleased(KeyEvent e) {
+		clientCharacter.stop();
+	}
 }

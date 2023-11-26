@@ -46,6 +46,26 @@ public class ArcadeServer extends JFrame {
 		public int clientId[] = {-1,-1,-1,-1,-1,-1,-1,-1}; // 클라이언트 아이디 저장
 	}
 	
+	// 게임 내 캐릭터 속성
+	class GameCharacter {
+		// 클라이언트 속성
+		public int clientId = -1;
+		public String username;
+		public BufferedWriter out;
+		
+		// 캐릭터 속성
+		public int x;
+		public int y;
+		public int speed;
+		public int attackRange;
+		public boolean isDead;
+	}
+	
+	// 게임에서 유저 캐릭터 정보
+	GameCharacter characters[] = new GameCharacter[8];
+	
+	
+	// 대기방 목록
 	private Vector<UserInfoWaitRoom> waitRoomList = new Vector<UserInfoWaitRoom>();
 	
 	private JPanel contentPane;
@@ -320,6 +340,10 @@ public class ArcadeServer extends JFrame {
 						break;
 					case 8: // 클라이언트가 시작 버튼 누를 시
 						int userCounts = Integer.parseInt(message.split("/")[4]);
+						
+						// 방장 1명만 있을시, 실행X
+						if(userCounts==1) return;
+						
 						// 모든 유저가 준비 상태가 아니면, 실행하지 않는다
 						for(int i=0;i<userCounts;i++) {
 							if(waitRoomList.elementAt(Integer.parseInt(msgContent)).isReady[i]==false) return;
@@ -338,15 +362,72 @@ public class ArcadeServer extends JFrame {
 							
 						}
 						
+						// 클라이언트 게임 방에 대한 정보 저장
+						for(int i=0;i<userCounts;i++) {
+							GameCharacter c = new GameCharacter();
+							c.x = 50+((int) Math.random())*200;
+							c.y = 50+((int) Math.random())*200;
+							c.clientId = _targetRoom.clientId[i];
+							characters[i] = c;
+						}
+						
 						// 해당 방 초기화
 						rooms[Integer.parseInt(msgContent)] = false;
 						for(int i=0;i<8;i++) {
-							_targetRoom.isReady[roomIndex] = false;
-							_targetRoom.isUserEntered[roomIndex] = false;
-							_targetRoom.userName[roomIndex] = "-";
-							_targetRoom.clientId[roomIndex] = -1;
+							_targetRoom.isReady[i] = false;
+							_targetRoom.isUserEntered[i] = false;
+							_targetRoom.userName[i] = "-";
+							_targetRoom.clientId[i] = -1;
 						}
 						_targetRoom.isReady[0] = true; // 방장은 레디 상태로
+						
+						// 보낼 방 정보들 담을 string
+						String msgContents = "";
+						for(int i=0;i<userCounts;i++) {
+							msgContents += characters[i].x;
+							msgContents += ",";
+						}
+						msgContents += "/";
+						for(int i=0;i<userCounts;i++) {
+							msgContents += characters[i].y;
+							msgContents += ",";
+						}
+						
+						// 게임 방 정보 전송
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"\n");
+						}
+						
+						break;
+					case 9: // 클라이언트 게임 방 내의 플레이어 정보 수신 및 전송
+						
+						int clientId = Integer.parseInt(message.split("/")[3]); // 클라 아이디
+						int client_X = Integer.parseInt(message.split("/")[4]); // 캐릭터좌표 x값
+						int client_Y = Integer.parseInt(message.split("/")[5]); // 캐릭터좌표 y값
+						
+						characters[clientId].x = client_X;
+						characters[clientId].y = client_Y;
+						
+						// 보낼 방 정보들 담을 string
+						String _msgContents = "";
+						for(int i=0;i<8;i++) {
+							if(characters[i]==null) break;
+							_msgContents += characters[i].x;
+							_msgContents += ",";
+						}
+						_msgContents += "/";
+						for(int i=0;i<8;i++) {
+							if(characters[i]==null) break;
+							_msgContents += characters[i].y;
+							_msgContents += ",";
+						}
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("6/"+userId+"/"+userName+"/"+_msgContents+"\n");
+						}
+						
 						
 						break;
 					default:

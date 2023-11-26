@@ -198,24 +198,38 @@ public class ClientLobby extends JFrame {
 					roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.refreshWaitingRoom();
 					break;
 				case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다
-					System.out.println(msg);
+					int userCount = 0; // 대기방 유저수
+					int readyUserCount = 0; // 준비 완료 한 유저 수
 					for(int i=0;i<8;i++) {
+						if(!msg.split("/")[4].split(",")[i].equals("-"))userCount++;
+						System.out.println(roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userName);
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userName = msg.split("/")[4].split(",")[i];
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).isReady = (msg.split("/")[5].split(", ")[i].equals("true"))?true:false;
 						
 						// 대기방 유저 상태 변경 - 준비 상태인지 아닌지
 						if(roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).isReady) {
 							roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userReady(true);
+							readyUserCount++;
 						}
 						else {
 							roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userReady(false);
 						}
 					}
+					System.out.println(userCount+", "+readyUserCount);
+					if(userCount == readyUserCount) roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.SetStartBtnAble();
+					else roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.SetStartBtnDisable();
 					break;
 				case 4: // 서버가 클라이언트에게 게임 시작 명령을 보내는 경우, 이를 처리한다
 					// 클라이언트 id가 일치하는 경우, 게임 시작
 					if(Integer.parseInt(msg.split("/")[4])==clientId)
 						roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.gamePlay();
+					break;
+				case 5: // 서버가 클라이언트에게 게임 시작 시 정보 전송
+					int userCounts = Integer.parseInt(msgContent);
+					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5]);
+					break;
+				case 6: // 서버가 클라이언트에게 캐릭터의 좌표, x,y를 불러온다
+					gameInstance.UpdateCharacterVector(msg.split("/")[3], msg.split("/")[4]);
 					break;
 				default:
 					break;
