@@ -1,4 +1,7 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import java.util.Random;
+
 public class ClientWaitingRoom extends JFrame {
 	
 	private ImageIcon BG = new ImageIcon("./WaitingRoomImages/waitRoomBG.png");
@@ -19,6 +24,14 @@ public class ClientWaitingRoom extends JFrame {
 	private ImageIcon readyButton = new ImageIcon("./WaitingRoomImages/readyButton.png");
 	private ImageIcon selectDaoButton = new ImageIcon("./WaitingRoomImages/characterDao.png");
 	private ImageIcon selectDiziniButton = new ImageIcon("./WaitingRoomImages/characterDizini.png");
+	private ImageIcon selectBazziButton = new ImageIcon("./WaitingRoomImages/characterBazzi.png");
+	private ImageIcon selectEthiButton = new ImageIcon("./WaitingRoomImages/characterEthi.png");
+	private ImageIcon selectKephiButton = new ImageIcon("./WaitingRoomImages/characterKephi.png");
+	private ImageIcon selectMaridButton = new ImageIcon("./WaitingRoomImages/characterMarid.png");
+	private ImageIcon selectMosButton = new ImageIcon("./WaitingRoomImages/characterMos.png");
+	private ImageIcon selectUniButton = new ImageIcon("./WaitingRoomImages/characterUni.png");
+	private ImageIcon selectRandomButton = new ImageIcon("./WaitingRoomImages/characterRandom.png");
+	
 	private ImageIcon selectVillageMapButton = new ImageIcon("./WaitingRoomImages/mapVillage.png");
 	private ImageIcon comingsoonIcon = new ImageIcon("./WaitingRoomImages/mapComingsoon.png");
 	private ImageIcon checkIcon = new ImageIcon("./WaitingRoomImages/check.png");
@@ -36,10 +49,20 @@ public class ClientWaitingRoom extends JFrame {
 	
 	private JButton selectDao;
 	private JButton selectDizini;
+	private JButton selectBazzi;
+	private JButton selectEthi;
+	private JButton selectKephi;
+	private JButton selectMarid;
+	private JButton selectMos;
+	private JButton selectUni;
+	private JButton selectRandom;
+	
 	private JButton selectVillageMap;
 	private JLabel comingsoon;
 	private JLabel check;
 	
+	private String selectedCharacter;
+	private String selectedMap;
 	
 	public Vector<ClientWaitingRoomUsers> waitUsers = new Vector<ClientWaitingRoomUsers>();
 	
@@ -73,7 +96,7 @@ public class ClientWaitingRoom extends JFrame {
 		SelectCharFunc seletDaoFunc = new SelectCharFunc();
 		selectDao.addMouseListener(seletDaoFunc);
 		selectDao.setSize(selectDaoButton.getIconWidth(),selectDaoButton.getIconHeight());
-		selectDao.setLocation(507,112);
+		selectDao.setLocation(504,57);
 		bgUI.add(selectDao);
 		selectDao.setVisible(true);
 		
@@ -82,9 +105,74 @@ public class ClientWaitingRoom extends JFrame {
 		SelectCharFunc seletDiziniFunc = new SelectCharFunc();
 		selectDizini.addMouseListener(seletDiziniFunc);
 		selectDizini.setSize(selectDiziniButton.getIconWidth(),selectDiziniButton.getIconHeight());
-		selectDizini.setLocation(631,112);
+		selectDizini.setLocation(567,57);
 		bgUI.add(selectDizini);
 		selectDizini.setVisible(true);
+		
+		// 모스
+		selectMos = new JButton(selectMosButton);
+		SelectCharFunc seletMosFunc = new SelectCharFunc();
+		selectMos.addMouseListener(seletMosFunc);
+		selectMos.setSize(selectMosButton.getIconWidth(),selectMosButton.getIconHeight());
+		selectMos.setLocation(629,57);
+		bgUI.add(selectMos);
+		selectMos.setVisible(true);
+		
+		// 에띠
+		selectEthi= new JButton(selectEthiButton);
+		SelectCharFunc seletEthiFunc = new SelectCharFunc();
+		selectEthi.addMouseListener(seletEthiFunc);
+		selectEthi.setSize(selectEthiButton.getIconWidth(),selectEthiButton.getIconHeight());
+		selectEthi.setLocation(691,57);
+		bgUI.add(selectEthi);
+		selectEthi.setVisible(true);
+		
+		// 마리드
+		selectMarid = new JButton(selectMaridButton);
+		SelectCharFunc seletMaridFunc = new SelectCharFunc();
+		selectMarid.addMouseListener(seletMaridFunc);
+		selectMarid.setSize(selectMaridButton.getIconWidth(),selectMaridButton.getIconHeight());
+		selectMarid.setLocation(504,187);
+		bgUI.add(selectMarid);
+		selectMarid.setVisible(true);
+		
+		// 배찌
+		selectBazzi = new JButton(selectBazziButton);
+		SelectCharFunc seletBazziFunc = new SelectCharFunc();
+		selectBazzi.addMouseListener(seletBazziFunc);
+		selectBazzi.setSize(selectBazziButton.getIconWidth(),selectBazziButton.getIconHeight());
+		selectBazzi.setLocation(567,187);
+		bgUI.add(selectBazzi);
+		selectBazzi.setVisible(true);
+		
+		// 우니
+		selectUni = new JButton(selectUniButton);
+		SelectCharFunc seletUniFunc = new SelectCharFunc();
+		selectUni.addMouseListener(seletUniFunc);
+		selectUni.setSize(selectUniButton.getIconWidth(),selectUniButton.getIconHeight());
+		selectUni.setLocation(629,187);
+		bgUI.add(selectUni);
+		selectUni.setVisible(true);
+		
+		// 케피
+		selectKephi = new JButton(selectKephiButton);
+		SelectCharFunc seletKephiFunc = new SelectCharFunc();
+		selectKephi.addMouseListener(seletKephiFunc);
+		selectKephi.setSize(selectKephiButton.getIconWidth(),selectKephiButton.getIconHeight());
+		selectKephi.setLocation(691,187);
+		bgUI.add(selectKephi);
+		selectKephi.setVisible(true);
+		
+		
+		// 랜덤
+		selectRandom = new JButton(selectRandomButton);
+		SelectCharFunc seletRandomFunc = new SelectCharFunc();
+		selectRandom.addMouseListener(seletRandomFunc);
+		selectRandom.setSize(selectRandomButton.getIconWidth(),selectRandomButton.getIconHeight());
+		selectRandom.setLocation(597,122);
+		bgUI.add(selectRandom);
+		selectRandom.setVisible(true);
+		
 		
 		// 맵선택 UI
 		// 빌리지
@@ -183,12 +271,68 @@ public class ClientWaitingRoom extends JFrame {
 	public class SelectCharFunc extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			
 			if (e.getSource() == selectDao) {
-	            System.out.println("Dao Selected");
+	            selectedCharacter = "Dao";
+	            System.out.println("Dao Selected!");
 	            
 	        } else if (e.getSource() == selectDizini) {
-	            System.out.println("Dizini Selected");
-	            
+	        	selectedCharacter = "Dizini";
+	        	System.out.println("Dizini Selected!");
+	        	
+	        } else if (e.getSource() == selectBazzi) {
+	        	selectedCharacter = "Bazzi";
+	        	System.out.println("Bazzi Selected!");
+	        	
+	        } else if (e.getSource() == selectEthi) {
+	        	selectedCharacter = "Ethi";
+	        	System.out.println("Ethi Selected!");
+	        	
+	        } else if (e.getSource() == selectKephi) {
+	        	selectedCharacter = "Kephi";
+	        	System.out.println("Kephi Selected!");
+	        	
+	        } else if (e.getSource() == selectMarid) {
+	        	selectedCharacter = "Marid";
+	        	System.out.println("Marid Selected!");
+	        	
+	        } else if (e.getSource() == selectMos) {
+	        	selectedCharacter = "Mos";
+	        	System.out.println("Mos Selected!");
+	        	
+	        } else if (e.getSource() == selectUni) {
+	        	selectedCharacter = "Uni";
+	        	System.out.println("Uni Selected!");
+	        	
+	        } else if (e.getSource() == selectRandom) {
+	        	System.out.println("Random Selected!");
+	        	Random random = new Random();
+	        	int randomNumber = random.nextInt(8) + 1;
+	        	if (randomNumber == 1) {
+	        		selectedCharacter = "Dao";
+	        		System.out.println("Dao Selected Randomly!");
+	        	} else if (randomNumber == 2) {
+	        		selectedCharacter = "Dizini";
+	        		System.out.println("Dizini Selected Randomly!");
+	        	} else if (randomNumber == 3) {
+	        		selectedCharacter = "Bazzi";
+	        		System.out.println("Bazzi Selected Randomly!");
+	        	} else if (randomNumber == 4) {
+	        		selectedCharacter = "Ethi";
+	        		System.out.println("Ethi Selected Randomly!");
+	        	} else if (randomNumber == 5) {
+	        		selectedCharacter = "Kephi";
+	        		System.out.println("Kephi Selected Randomly!");
+	        	} else if (randomNumber == 6) {
+	        		selectedCharacter = "Marid";
+	        		System.out.println("Marid Selected Randomly!");
+	        	} else if (randomNumber == 7) {
+	        		selectedCharacter = "Mos";
+	        		System.out.println("Mos Selected Randomly!");
+	        	} else if (randomNumber == 8) {
+	        		selectedCharacter = "Uni";
+	        		System.out.println("Uni Selected Randomly!");
+	        	}
 	        }
 		}
 		
@@ -198,8 +342,8 @@ public class ClientWaitingRoom extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getSource() == selectVillageMap) {
-	            System.out.println("Village Map Selected");
- 
+				selectedMap = "Village";
+				System.out.println("Village Map Selected!");
 	        } 
 		}
 		
@@ -230,7 +374,7 @@ public class ClientWaitingRoom extends JFrame {
 				// 유저 수를 세고, 서버로 전달한다. (서버에서는 준비한 유저 수와 비교해서 같으면 게임을 실행시킨다)
 				int userCount = 0;
 				for(int i=0;i<waitUsers.size();i++) if(waitUsers.elementAt(i).isUserEntered) userCount++;
-				out.write("8/"+userId+"/"+username+"/"+roomNumber+"/"+userCount+"\n");
+				out.write("8/"+userId+"/"+username+"/"+roomNumber+"/"+userCount+"/"+selectedCharacter+"/"+selectedMap+"\n");
 				out.flush();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -245,7 +389,7 @@ public class ClientWaitingRoom extends JFrame {
 		public void mouseClicked(MouseEvent e) {
 			try {
 				// 서버로 어떤 클라이언트가 준비 상태를 변경하는지 전송
-				out.write("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"\n");
+				out.write("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"/"+selectedCharacter+"\n");
 				out.flush();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
