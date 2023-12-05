@@ -229,7 +229,15 @@ public class ClientLobby extends JFrame {
 					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5]);
 					break;
 				case 6: // 서버가 클라이언트에게 캐릭터의 좌표, x,y를 불러온다
-					gameInstance.UpdateCharacterVector(msg.split("/")[3], msg.split("/")[4]);
+					gameInstance.UpdateCharacterVector(
+							msg.split("/")[3], 
+							msg.split("/")[4], 
+							Integer.parseInt(msg.split("/")[5]), 
+							Integer.parseInt(msg.split("/")[6])
+						);
+					break;
+				case 7: // 폭탄 생성
+					gameInstance.SetBomb(Integer.parseInt(msg.split("/")[3]), Integer.parseInt(msg.split("/")[4]), Integer.parseInt(msg.split("/")[5]));
 					break;
 				default:
 					break;

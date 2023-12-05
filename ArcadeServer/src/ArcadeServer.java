@@ -1,6 +1,7 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -59,6 +60,7 @@ public class ArcadeServer extends JFrame {
 		public int speed;
 		public int attackRange;
 		public boolean isDead;
+		public int dir;
 	}
 	
 	// 게임에서 유저 캐릭터 정보
@@ -405,9 +407,12 @@ public class ArcadeServer extends JFrame {
 						int clientId = Integer.parseInt(message.split("/")[3]); // 클라 아이디
 						int client_X = Integer.parseInt(message.split("/")[4]); // 캐릭터좌표 x값
 						int client_Y = Integer.parseInt(message.split("/")[5]); // 캐릭터좌표 y값
+						int client_dir = Integer.parseInt(message.split("/")[6]); // 캐릭터좌표 moveDirection
+						int client_characterIndex = Integer.parseInt(message.split("/")[7]); // 캐릭터좌표 moveDirection
 						
 						characters[clientId].x = client_X;
 						characters[clientId].y = client_Y;
+						characters[clientId].dir = client_dir;
 						
 						// 보낼 방 정보들 담을 string
 						String _msgContents = "";
@@ -422,12 +427,29 @@ public class ArcadeServer extends JFrame {
 							_msgContents += characters[i].y;
 							_msgContents += ",";
 						}
+						_msgContents +="/";
+						_msgContents += client_dir;
+						_msgContents +="/";
+						_msgContents += client_characterIndex;
 						
 						for(int i=0;i<UserVec.size();i++) {
 							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
-							user.SendToClient("6/"+userId+"/"+userName+"/"+_msgContents+"\n");
+							user.SendToClient("6/"+userId+"/"+userName+"/"+_msgContents+"/"+"\n");
 						}
+						break;
 						
+					case 10:
+						int client_Id = Integer.parseInt(message.split("/")[3]); // 클라 아이디
+						int clientRow = Integer.parseInt(message.split("/")[4]); // 캐릭터좌표 row값
+						int clientCol = Integer.parseInt(message.split("/")[5]); // 캐릭터좌표 col값
+						
+						// 보낼 방 정보들 담을 string
+						_msgContents = clientRow + "/" + clientCol + "/" + client_Id;
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("7/"+userId+"/"+userName+"/"+_msgContents+"/"+"\n");
+						}
 						
 						break;
 					default:

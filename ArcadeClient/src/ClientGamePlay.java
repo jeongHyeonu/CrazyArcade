@@ -15,20 +15,23 @@ import Characters.GameCharacter.Direction;
 
 public class ClientGamePlay extends JFrame implements KeyListener {
 	
-	private ImageIcon bg = new ImageIcon("./GamePlayImages/bg.png"); //배경화면
+	private ImageIcon bg = new ImageIcon("./GamePlayImages/play_bg.png"); //배경화면
+	
+	private int blockWidth = 52;
+	private int blockHeight = 51;
 	
 	private ImageIcon block1 = new ImageIcon("./GamePlayImages/tiles/block1.png");
 	private ImageIcon block2 = new ImageIcon("./GamePlayImages/tiles/block2.png");
-	private ImageIcon block3 = new ImageIcon("./GamePlayImages/tiles/block3");
-	private ImageIcon block4 = new ImageIcon("./GamePlayImages/tiles/block4");
-	private ImageIcon block5 = new ImageIcon("./GamePlayImages/tiles/block5");
-	private ImageIcon block6 = new ImageIcon("./GamePlayImages/tiles/block6");
-	private ImageIcon block7 = new ImageIcon("./GamePlayImages/tiles/block7");
-	private ImageIcon block8 = new ImageIcon("./GamePlayImages/tiles/block8");
-	private ImageIcon block9 = new ImageIcon("./GamePlayImages/tiles/block9");
-	private ImageIcon block10 = new ImageIcon("./GamePlayImages/tiles/block10");
-	private ImageIcon block11 = new ImageIcon("./GamePlayImages/tiles/block11");
-	private ImageIcon block12 = new ImageIcon("./GamePlayImages/tiles/block12");
+	private ImageIcon block3 = new ImageIcon("./GamePlayImages/tiles/block3.png");
+	private ImageIcon block4 = new ImageIcon("./GamePlayImages/tiles/block4.png");
+	private ImageIcon block5 = new ImageIcon("./GamePlayImages/tiles/block5.png");
+	private ImageIcon block6 = new ImageIcon("./GamePlayImages/tiles/block6.png");
+	private ImageIcon block7 = new ImageIcon("./GamePlayImages/tiles/block7.png");
+	private ImageIcon block8 = new ImageIcon("./GamePlayImages/tiles/block8.png");
+	private ImageIcon block9 = new ImageIcon("./GamePlayImages/tiles/block9.png");
+	private ImageIcon block10 = new ImageIcon("./GamePlayImages/tiles/block10.png");
+	private ImageIcon block11 = new ImageIcon("./GamePlayImages/tiles/block11.png");
+	private ImageIcon block12 = new ImageIcon("./GamePlayImages/tiles/block12.png");
 	
 	private ImageIcon dizini = new ImageIcon("./GamePlayImages/Charactor/dizini_front.png");
 	
@@ -38,19 +41,19 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	JLabel backgroundLabel = new JLabel(bg);
 	
     int[][] MapArray = { //맵
-		   {0, 3, 2, 3, 2, 8, 0, 0, 1, 8, 5, 2, 5, 0, 5}, 
-		   {0, 4, 1, 4, 1, 7, 1, 0, 0, 7, 2, 3, 0, 0, 1}, 
-		   {0, 0, 3, 2, 3, 8, 0, 1, 1, 8, 5, 1, 5, 1, 5},
-		   {1, 4, 1, 4, 1, 7, 1, 0, 0, 7, 3, 2, 3, 2, 3},
-		   {2, 3, 2, 3, 2, 8, 0, 0, 1, 8, 5, 1, 5, 1, 5},
-		   {3, 4, 3, 4, 3, 7, 1, 1, 0, 0, 2, 3, 2, 3, 2},
-		   {7, 8, 7, 8, 7, 8, 0, 0, 1, 8, 7, 8, 7, 8, 7},
-		   {2, 3, 2, 3, 2, 0, 1, 0, 0, 7, 2, 4, 2, 4, 2},
-		   {6, 1, 6, 1, 6, 8, 0, 1, 1, 8, 3, 2, 3, 2, 3},
-		   {3, 2, 3, 2, 3, 7, 1, 0, 0, 7, 1, 4, 1, 4, 1},
-		   {6, 0, 6, 1, 6, 8, 0, 0, 1, 8, 2, 3, 2, 3, 0},
-		   {0, 0, 2, 3, 2, 7, 1, 1, 0, 7, 1, 4, 1, 4, 0},
-		   {6, 0, 6, 2, 6, 8, 0, 0, 1, 8, 3, 2, 3, 0, 0},
+		   {0, 3, 2, 3, 2,11, 0, 0, 1,11, 5, 2, 5, 0, 5}, 
+		   {0, 4, 1, 4, 1,10, 1, 0, 0,10, 2, 3, 0, 0, 1}, 
+		   {0, 0, 3, 2, 3,11, 0, 1, 1,11, 5, 1, 5, 1, 5},
+		   {1, 4, 1, 4, 1,10, 1, 0, 0,10, 3, 2, 3, 2, 3},
+		   {2, 3, 2, 3, 2,11, 0, 0, 1,11, 5, 1, 5, 1, 5},
+		   {3, 4, 3, 4, 3,10, 1, 1, 0, 0, 2, 3, 2, 3, 2},
+		   {10,11,10,11,10,11, 0, 0, 1,11,10,11,10,11,10},
+		   {2, 3, 2, 3, 2, 0, 1, 0, 0,10, 2, 4, 2, 4, 2},
+		   {6, 1, 6, 1, 6,11, 0, 1, 1,11, 3, 2, 3, 2, 3},
+		   {3, 2, 3, 2, 3,10, 1, 0, 0,10, 1, 4, 1, 4, 1},
+		   {6, 0, 6, 1, 6,11, 0, 0, 1,11, 2, 3, 2, 3, 0},
+		   {0, 0, 2, 3, 2,10, 1, 1, 0,10, 1, 4, 1, 4, 0},
+		   {6, 0, 6, 2, 6,11, 0, 0, 1,11, 3, 2, 3, 0, 0},
 	};
     
     // 캐릭터
@@ -98,21 +101,29 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         });
         movementThread.start();
         
-//        // 타일 및 블럭 배치
-//        for(int row=0;row<15;row++) {
-//        	for(int column=0;column<13;column++) {
-//        		JLabel block = new JLabel();
-//        		block.setLocation(block1.getIconWidth()*row,block1.getIconHeight()*column);
-//        		block.setSize(block1.getIconWidth(),block1.getIconHeight());
-//        		if(MapArray[column][row]==0) block.setIcon(block1);
-//        		else block.setIcon(block2);
-//        		backgroundLabel.add(block);
-//        	}
-//        }
+        // 타일 및 블럭 배치
+        for(int row=0;row<15;row++) {
+        	for(int column=12;column>=0;column--) { // 라벨이 위에서부터 아래로 그려져야 블럭이 보이므로..
+        		JLabel block = new JLabel();
+        		block.setLocation(26+(blockWidth*row),43+(blockHeight*column));
+        		block.setSize(blockWidth, blockHeight+20);
+        		if(MapArray[column][row]==1) block.setIcon(block1);
+        		else if(MapArray[column][row]==2) block.setIcon(block2);
+        		else if(MapArray[column][row]==3) block.setIcon(block3);
+        		else if(MapArray[column][row]==4) block.setIcon(block4);
+        		else if(MapArray[column][row]==5) block.setIcon(block5);
+        		else if(MapArray[column][row]==6) block.setIcon(block6);
+        		else if(MapArray[column][row]==7) block.setIcon(block7);
+        		else if(MapArray[column][row]==8) block.setIcon(block8);
+        		else if(MapArray[column][row]==9) block.setIcon(block9);
+        		else if(MapArray[column][row]==10) block.setIcon(block10);
+        		else if(MapArray[column][row]==11) block.setIcon(block11);
+        		
+        		backgroundLabel.add(block);
+        	}
+        }
         
-        
-        
-		repaint();
+        backgroundLabel.repaint();
 	}
 	
 	public void CharacterCreate(int userCounts,String xList, String yList) {
@@ -125,24 +136,51 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 			int clientId = ClientLobby.instance.clientId;
 			BufferedWriter out = ClientLobby.instance.out;
 			GameCharacter c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
+			c.currentDir = Direction.down;
 			c.setSize(60,70);
 			c.setVisible(true);
 			characterVector.add(c);
 			backgroundLabel.add(c);
+			backgroundLabel.setComponentZOrder(c, 0);
 		}
 		int clientId = ClientLobby.instance.clientId;
 		clientCharacter = characterVector.elementAt(clientId);
 	}
 	
-	public void UpdateCharacterVector(String xList, String yList) {
+	public void UpdateCharacterVector(String xList, String yList, int moveDir, int characterIndex) {
 		String[] clientX = xList.split(",");
 		String[] clientY = yList.split(",");
 		for(int i=0;i<userCounts;i++) {
 			characterVector.elementAt(i).x = Integer.parseInt(clientX[i]) ;
 			characterVector.elementAt(i).y = Integer.parseInt(clientY[i]) ;
-			characterVector.elementAt(i).setLocation(characterVector.elementAt(i).x,characterVector.elementAt(i).y);
-			characterVector.elementAt(i).repaint();
+			characterVector.elementAt(i).rowIndex = Integer.parseInt(clientX[i])/52 ;
+			characterVector.elementAt(i).columnIndex = Integer.parseInt(clientY[i])/51 ;
 		}
+		switch(moveDir) {
+        case -1: // 캐릭터 이동 정지
+        	characterVector.elementAt(characterIndex).stop();
+        	break;
+		case KeyEvent.VK_UP:
+			characterVector.elementAt(characterIndex).move(Direction.up);
+			break;
+		case KeyEvent.VK_DOWN:
+			characterVector.elementAt(characterIndex).move(Direction.down);
+			break;
+		case KeyEvent.VK_LEFT:
+			characterVector.elementAt(characterIndex).move(Direction.left);
+			break;
+		case KeyEvent.VK_RIGHT:
+			characterVector.elementAt(characterIndex).move(Direction.right);
+			break;
+		}
+		
+		characterVector.elementAt(characterIndex).repaint();
+	}
+	
+	public void SetBomb(int row, int col, int characterIndex) {
+		JLabel bombLabel = characterVector.elementAt(characterIndex).attack(row,col,backgroundLabel);
+		//backgroundLabel.add(bombLabel);
+		//bombLabel.repaint();
 	}
 	
     @Override
@@ -152,26 +190,37 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 
         switch (keyCode) {
             case KeyEvent.VK_UP:
+            	if(clientCharacter.y>0)
                 clientCharacter.y -= 10;
-                clientCharacter.move(Direction.up);
                 break;
             case KeyEvent.VK_DOWN:
+            	if(clientCharacter.y<this.getHeight())
             	clientCharacter.y += 10;
-            	clientCharacter.move(Direction.down);
                 break;
             case KeyEvent.VK_LEFT:
+            	if(clientCharacter.x>0)
             	clientCharacter.x -= 10;
-            	clientCharacter.move(Direction.left);
                 break;
             case KeyEvent.VK_RIGHT:
+            	if(clientCharacter.x<this.getWidth())
             	clientCharacter.x += 10;
-            	clientCharacter.move(Direction.right);
                 break;
+    		case KeyEvent.VK_SPACE:
+    			// 서버로 공격했다는 신호를 보낸다
+    	        try {
+    				clientCharacter.out.write("10/"+"_"+"/"+clientCharacter.username+"/"+clientCharacter.clientId+"/"+clientCharacter.rowIndex+"/"+clientCharacter.columnIndex+"\n");
+    				clientCharacter.out.flush();
+    	        } catch (IOException e1) {
+    				// TODO Auto-generated catch block
+    				e1.printStackTrace();
+    			}
+    	        return;
         }
         
         // 서버로 캐릭터 이동 전송
         try {
-			clientCharacter.out.write("9/"+"_"+"/"+clientCharacter.username+"/"+clientCharacter.clientId+"/"+clientCharacter.x+"/"+clientCharacter.y+"\n");
+        	int characterIndex = characterVector.indexOf(clientCharacter);
+			clientCharacter.out.write("9/"+"_"+"/"+clientCharacter.username+"/"+clientCharacter.clientId+"/"+clientCharacter.x+"/"+clientCharacter.y+"/"+keyCode+"/"+characterIndex+"\n");
 			clientCharacter.out.flush();
         } catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -181,10 +230,23 @@ public class ClientGamePlay extends JFrame implements KeyListener {
     }
 
 	@Override
-	public void keyTyped(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {
+	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		clientCharacter.stop();
+		if(e.getKeyCode() != KeyEvent.VK_SPACE) {
+	        // 서버로 캐릭터 이동 전송
+	        try {
+	        	// 캐릭터 이동 중단
+	        	int characterIndex = characterVector.indexOf(clientCharacter);
+				clientCharacter.out.write("9/"+"_"+"/"+clientCharacter.username+"/"+clientCharacter.clientId+"/"+clientCharacter.x+"/"+clientCharacter.y+"/"+ -1 +"/"+characterIndex+"\n");
+				clientCharacter.out.flush();
+	        } catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
 	}
 }

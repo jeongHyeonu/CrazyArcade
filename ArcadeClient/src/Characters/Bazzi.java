@@ -27,12 +27,6 @@ public class Bazzi extends GameCharacter {
 			backMove[i] = new ImageIcon("./GamePlayImages/Charactor/Bazzi/bazzi_back_"+i+".png");
 		}
 	}
-	
-	@Override
-	public void attack() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void died() {
