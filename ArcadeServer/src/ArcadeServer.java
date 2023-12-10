@@ -364,11 +364,15 @@ public class ArcadeServer extends JFrame {
 							
 						}
 						
+						int randomSpawnX[] = {1,1,8,14,15,7,8,8};
+						int randomSpawnY[] = {1,12,1,2,12,7,11,4};
+						
 						// 클라이언트 게임 방에 대한 정보 저장
 						for(int i=0;i<userCounts;i++) {
 							GameCharacter c = new GameCharacter();
-							c.x = 50+((int) Math.random())*200;
-							c.y = 50+((int) Math.random())*200;
+							int randInt = (int)(Math.random()*8);
+							c.x = randomSpawnX[randInt]*52 - 26;
+							c.y = randomSpawnY[randInt]*51 - 25;
 							c.clientId = _targetRoom.clientId[i];
 							characters[i] = c;
 						}
@@ -449,6 +453,29 @@ public class ArcadeServer extends JFrame {
 						for(int i=0;i<UserVec.size();i++) {
 							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
 							user.SendToClient("7/"+userId+"/"+userName+"/"+_msgContents+"/"+"\n");
+						}
+						
+						break;
+					case 100: // 폭탄 터지면, 방 배열 업데이트
+						int mapRow = Integer.parseInt(message.split("/")[3]); // row값
+						int mapCol = Integer.parseInt(message.split("/")[4]); // col값
+						
+						// 보낼 방 정보들 담을 string
+						_msgContents = mapRow + "/" + mapCol;
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("100/"+userId+"/"+userName+"/"+_msgContents+"/"+"\n");
+						}
+						
+						break;
+					case 101: // 플레이어가 폭탄 피격범위 내에 있는지 검사
+						int explosionX = Integer.parseInt(message.split("/")[3]); // 터질때 x값
+						int explosionY = Integer.parseInt(message.split("/")[4]); // 터질때 y값
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("101/_/_/"+explosionX+"/"+explosionY+"/"+"\n");
 						}
 						
 						break;

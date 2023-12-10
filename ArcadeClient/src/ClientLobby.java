@@ -239,6 +239,12 @@ public class ClientLobby extends JFrame {
 				case 7: // 폭탄 생성
 					gameInstance.SetBomb(Integer.parseInt(msg.split("/")[3]), Integer.parseInt(msg.split("/")[4]), Integer.parseInt(msg.split("/")[5]));
 					break;
+				case 100: // 게임 내 맵 배열 업데이트
+					gameInstance.DeleteBlockInMap(Integer.parseInt(msg.split("/")[3]), Integer.parseInt(msg.split("/")[4]));
+					break;
+				case 101: // 플레이어 폭탄 피격당했는지 검사
+					gameInstance.isCharacterAttacked(Integer.parseInt(msg.split("/")[3]),Integer.parseInt(msg.split("/")[4]));
+					break;
 				default:
 					break;
 				}

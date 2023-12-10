@@ -1,6 +1,7 @@
 package Characters;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
@@ -29,9 +30,20 @@ public class Bazzi extends GameCharacter {
 	}
 
 	@Override
+	public void BlockDestroyMessage(int x, int y) {
+		// TODO Auto-generated method stub
+		try {
+			out.write("100/_/_/"+x+"/"+y+"\n");
+			out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public void died() {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

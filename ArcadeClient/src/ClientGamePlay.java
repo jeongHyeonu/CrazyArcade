@@ -56,6 +56,9 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		   {6, 0, 6, 2, 6,11, 0, 0, 1,11, 3, 2, 3, 0, 0},
 	};
     
+    // 블록 라벨들
+    JLabel[][] MapLabelArray = new JLabel[13][15];
+    
     // 캐릭터
     private JLabel characterLabel;
 
@@ -105,7 +108,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         for(int row=0;row<15;row++) {
         	for(int column=12;column>=0;column--) { // 라벨이 위에서부터 아래로 그려져야 블럭이 보이므로..
         		JLabel block = new JLabel();
-        		block.setLocation(26+(blockWidth*row),43+(blockHeight*column));
+        		block.setLocation(26+(blockWidth*row),45+(blockHeight*column));
         		block.setSize(blockWidth, blockHeight+20);
         		if(MapArray[column][row]==1) block.setIcon(block1);
         		else if(MapArray[column][row]==2) block.setIcon(block2);
@@ -120,6 +123,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         		else if(MapArray[column][row]==11) block.setIcon(block11);
         		
         		backgroundLabel.add(block);
+        		MapLabelArray[column][row] = block;
         	}
         }
         
@@ -139,6 +143,8 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 			c.currentDir = Direction.down;
 			c.setSize(60,70);
 			c.setVisible(true);
+			c.rowIndex = x/blockWidth;
+			c.columnIndex = y/blockHeight;
 			characterVector.add(c);
 			backgroundLabel.add(c);
 			backgroundLabel.setComponentZOrder(c, 0);
@@ -153,8 +159,8 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		for(int i=0;i<userCounts;i++) {
 			characterVector.elementAt(i).x = Integer.parseInt(clientX[i]) ;
 			characterVector.elementAt(i).y = Integer.parseInt(clientY[i]) ;
-			characterVector.elementAt(i).rowIndex = Integer.parseInt(clientX[i])/52 ;
-			characterVector.elementAt(i).columnIndex = Integer.parseInt(clientY[i])/51 ;
+			characterVector.elementAt(i).rowIndex = Integer.parseInt(clientX[i])/blockWidth ;
+			characterVector.elementAt(i).columnIndex = Integer.parseInt(clientY[i])/blockHeight ;
 		}
 		switch(moveDir) {
         case -1: // 캐릭터 이동 정지
@@ -177,10 +183,31 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		characterVector.elementAt(characterIndex).repaint();
 	}
 	
+	// 폭탄 설치
 	public void SetBomb(int row, int col, int characterIndex) {
-		JLabel bombLabel = characterVector.elementAt(characterIndex).attack(row,col,backgroundLabel);
-		//backgroundLabel.add(bombLabel);
-		//bombLabel.repaint();
+		characterVector.elementAt(characterIndex).attack(row,col,backgroundLabel,MapArray);
+	}
+	
+	// 물풍선 터지면, 블록 지우기
+	public void DeleteBlockInMap(int row, int col) {
+		MapArray[col][row] = 0;
+		MapLabelArray[col][row].setVisible(false);
+		repaint();
+	}
+	
+	// 플레이어 피격시
+	public void CharacterAttacked(int client_id) {
+		characterVector.elementAt(client_id).Attacked();
+		repaint();
+	}
+	
+	// 플레이어 피격 검사
+	public void isCharacterAttacked(int x, int y) {
+		for(int i=0;i<userCounts;i++) {
+			if(x == characterVector.elementAt(i).rowIndex && y == characterVector.elementAt(i).columnIndex) {
+				characterVector.elementAt(i).Attacked();
+			}
+		}
 	}
 	
     @Override
@@ -188,22 +215,29 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         // keyPressed는 키를 눌렀을 때 호출됩니다.
         int keyCode = e.getKeyCode();
 
+        // 만약 캐릭터가 사망시 실행X
+        if(clientCharacter.isDead) return;
+        
         switch (keyCode) {
             case KeyEvent.VK_UP:
             	if(clientCharacter.y>0)
-                clientCharacter.y -= 10;
+            		if(MapArray[(clientCharacter.y-10)/blockHeight][clientCharacter.x/blockWidth]==0)
+                		clientCharacter.y -= 10;
                 break;
             case KeyEvent.VK_DOWN:
             	if(clientCharacter.y<this.getHeight())
-            	clientCharacter.y += 10;
+            		if(MapArray[(clientCharacter.y+10)/blockHeight][clientCharacter.x/blockWidth]==0)
+                		clientCharacter.y += 10;
                 break;
             case KeyEvent.VK_LEFT:
             	if(clientCharacter.x>0)
-            	clientCharacter.x -= 10;
+            		if(MapArray[clientCharacter.y/blockHeight][(clientCharacter.x-10)/blockWidth]==0)
+            			clientCharacter.x -= 10;
                 break;
             case KeyEvent.VK_RIGHT:
             	if(clientCharacter.x<this.getWidth())
-            	clientCharacter.x += 10;
+            		if(MapArray[clientCharacter.y/blockHeight][(clientCharacter.x+10)/blockWidth]==0)
+            			clientCharacter.x += 10;
                 break;
     		case KeyEvent.VK_SPACE:
     			// 서버로 공격했다는 신호를 보낸다

@@ -2,16 +2,14 @@ package Characters;
 
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import Characters.GameCharacter.Direction;
 
-
-
 public abstract class GameCharacter extends JLabel{
-	
 	private ImageIcon bomb[] = {
 		new ImageIcon("./WaterBomb/bomb0.png"),
 		new ImageIcon("./WaterBomb/bomb1.png"),
@@ -137,6 +135,31 @@ public abstract class GameCharacter extends JLabel{
 		new ImageIcon("./WaterBomb/pop5.png"),
 	};
 	
+	private ImageIcon attackedImages[] = {
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap0.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap1.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap2.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap3.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap4.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap5.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap6.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap7.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap8.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap9.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap10.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap11.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/trap12.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death0.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death1.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death2.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death3.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death4.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death5.png"),
+		new ImageIcon("./GamePlayImages/Charactor/Player_Death/death6.png"),
+	};
+	
+	
+	
 	// 클라이언트 속성
 	public int clientId;
 	public String username;
@@ -171,8 +194,10 @@ public abstract class GameCharacter extends JLabel{
 	
 	// 캐릭터들이 갖는 메서드
 	public void move(Direction d) {
+		if(isDead)return; // 사망한경우 실행X
 		currentDir = d;
 		moveIndex = (moveIndex+1)%6;
+		
 		switch(d) {
 		case up:
 			this.setIcon(backMove[moveIndex]);
@@ -189,10 +214,12 @@ public abstract class GameCharacter extends JLabel{
 		}
 	}
 	public void stop() {
+		if(isDead)return; // 사망한경우 실행X
 		moveIndex = 0;
 		SetPlayerDir();
 	};
 	public void SetPlayerDir() {
+		if(isDead)return; // 사망한경우 실행X
 		switch(currentDir) {
 		case up: 
 			this.setIcon(backMove[2]);
@@ -208,7 +235,8 @@ public abstract class GameCharacter extends JLabel{
 			break;
 		}
 	}
-	public JLabel attack(int row, int col, JLabel background) {
+	public JLabel attack(int row, int col, JLabel background, int map[][]) {
+		if(isDead) return null; // 사망한경우 실행X
 		int bomb_X = row * 52 + 25;
 		int bomb_Y = col * 51 + 53;
 		
@@ -225,11 +253,11 @@ public abstract class GameCharacter extends JLabel{
                     Thread.sleep(150);  // 100밀리초마다 쉬면서 이동
                     bombLabel.setIcon(bomb[(index++)%4]);
                     if(index==12) { // 폭발
-                    	bombExplosion(Direction.middle,row,col,background);
-                    	bombExplosion(Direction.left,row-1,col,background);
-                    	bombExplosion(Direction.right,row+1,col,background);
-                    	bombExplosion(Direction.up,row,col-1,background);
-                    	bombExplosion(Direction.down,row,col+1,background);
+                    	bombExplosion(Direction.middle,row,col,background,map);
+                    	if(row>0) bombExplosion(Direction.left,row-1,col,background,map);
+                    	if(row<15) bombExplosion(Direction.right,row+1,col,background,map);
+                    	if(col>0) bombExplosion(Direction.up,row,col-1,background,map);
+                    	if(col<13) bombExplosion(Direction.down,row,col+1,background,map);
                     	bombLabel.setVisible(false);
                     }
                 } catch (InterruptedException e) {
@@ -240,11 +268,15 @@ public abstract class GameCharacter extends JLabel{
 		return bombLabel;
 	};
 	
-	private void bombExplosion(Direction d,int _row, int _col, JLabel _background) {
+	private void bombExplosion(Direction d,int _row, int _col, JLabel _background, int[][] _map) {
 		int bomb_X = _row * 52 + 25;
 		int bomb_Y = _col * 51 + 53;
 		JLabel explosionLabel;
 		Thread explosionThread;
+		
+		// 폭발 위치에 캐릭터가 있는지 검사
+		isCharacterAttacked(_row,_col);
+		
 		switch(d) {
 		case middle:
 			explosionLabel = new JLabel(bombMiddle[0]);
@@ -257,7 +289,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 쉬면서 이동
+	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombMiddle[(index++)%5]);
 	                    if(index==5) {
 	                    	explosionLabel.setVisible(false);
@@ -269,6 +301,16 @@ public abstract class GameCharacter extends JLabel{
 			explosionThread.start();
 			break;
 		case up:
+			switch(_map[_col][_row]) { // 벽과의 충돌 검사 - 뚫을 수 있는 벽은 뚫는다
+				case 1:
+				case 2:
+				case 3:
+					BlockDestroyMessage(_row,_col);
+					break;
+				default:
+					break;
+			}
+			if(_map[_col][_row]!=0) return; // 그 외 다른 블럭이 막고 있다면 실행 X, 바닥 뚫려있을때만 실행
 			explosionLabel = new JLabel(bombUp_1[0]);
 			explosionLabel.setLocation(bomb_X,bomb_Y);
 			explosionLabel.setSize(bomb[0].getIconWidth(),bomb[0].getIconHeight());
@@ -279,7 +321,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 쉬면서 이동
+	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombUp_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -289,8 +331,19 @@ public abstract class GameCharacter extends JLabel{
 	            }
 			});
 			explosionThread.start();
+
 			break;
 		case right:
+			switch(_map[_col][_row]) { // 벽과의 충돌 검사 - 뚫을 수 있는 벽은 뚫는다
+				case 1:
+				case 2:
+				case 3:
+					BlockDestroyMessage(_row,_col);
+					break;
+				default:
+					break;
+			}
+			if(_map[_col][_row]!=0) return; // 그 외 다른 블럭이 막고 있다면 실행 X, 바닥 뚫려있을때만 실행
 			explosionLabel = new JLabel(bombRight_1[0]);
 			explosionLabel.setLocation(bomb_X,bomb_Y);
 			explosionLabel.setSize(bomb[0].getIconWidth(),bomb[0].getIconHeight());
@@ -301,7 +354,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 쉬면서 이동
+	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombRight_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -313,6 +366,16 @@ public abstract class GameCharacter extends JLabel{
 			explosionThread.start();
 			break;
 		case left:
+			switch(_map[_col][_row]) { // 벽과의 충돌 검사 - 뚫을 수 있는 벽은 뚫는다
+				case 1:
+				case 2:
+				case 3:
+					BlockDestroyMessage(_row,_col);
+					break;
+				default:
+					break;
+			}
+			if(_map[_col][_row]!=0) return; // 그 외 다른 블럭이 막고 있다면 실행 X, 바닥 뚫려있을때만 실행
 			explosionLabel = new JLabel(bombLeft_1[0]);
 			explosionLabel.setLocation(bomb_X,bomb_Y);
 			explosionLabel.setSize(bomb[0].getIconWidth(),bomb[0].getIconHeight());
@@ -323,7 +386,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 쉬면서 이동
+	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombLeft_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -335,6 +398,16 @@ public abstract class GameCharacter extends JLabel{
 			explosionThread.start();
 			break;
 		case down:
+			switch(_map[_col][_row]) { // 벽과의 충돌 검사 - 뚫을 수 있는 벽은 뚫는다
+				case 1:
+				case 2:
+				case 3:
+					BlockDestroyMessage(_row,_col);
+					break;
+				default:
+					break;
+			}
+			if(_map[_col][_row]!=0) return; // 그 외 다른 블럭이 막고 있다면 실행 X, 바닥 뚫려있을때만 실행
 			explosionLabel = new JLabel(bombDown_1[0]);
 			explosionLabel.setLocation(bomb_X,bomb_Y);
 			explosionLabel.setSize(bomb[0].getIconWidth(),bomb[0].getIconHeight());
@@ -345,7 +418,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 쉬면서 이동
+	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombDown_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -360,5 +433,21 @@ public abstract class GameCharacter extends JLabel{
 
 	}
 	
+	public void isCharacterAttacked(int _x, int _y) {
+		try {
+			out.write("101/_/_/"+_x+"/"+_y+"/"+"\n");
+			out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void Attacked() {
+		setIcon(attackedImages[0]);
+		isDead=true;
+	}
+	
+	public abstract void BlockDestroyMessage(int x, int y);
 	public abstract void died();
 }
