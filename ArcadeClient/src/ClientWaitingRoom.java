@@ -391,6 +391,7 @@ public class ClientWaitingRoom extends JFrame {
 				// 서버로 어떤 클라이언트가 준비 상태를 변경하는지 전송
 				out.write("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"/"+selectedCharacter+"\n");
 				out.flush();
+				System.out.println("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"/"+selectedCharacter+"\n");
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -2,6 +2,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -130,7 +131,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         backgroundLabel.repaint();
 	}
 	
-	public void CharacterCreate(int userCounts,String xList, String yList) {
+	public void CharacterCreate(int userCounts,String xList, String yList, List<String> selectedCharacter) {
 		this.userCounts = userCounts;
 		for(int i=0;i<userCounts;i++) {
 			// 캐릭터 생성
@@ -139,7 +140,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 			String userName = ClientLobby.instance.username;
 			int clientId = ClientLobby.instance.clientId;
 			BufferedWriter out = ClientLobby.instance.out;
-			GameCharacter c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
+			GameCharacter c = CharacterFactory.getCharacter(selectedCharacter.get(i),x,y,clientId,userName,out);
 			c.currentDir = Direction.down;
 			c.setSize(60,70);
 			c.setVisible(true);

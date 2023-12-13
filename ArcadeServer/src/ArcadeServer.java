@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -38,6 +39,9 @@ public class ArcadeServer extends JFrame {
 	
 	private boolean[] rooms = {false,false,false,false,false,false}; // 이용 가능한 방 저장
 	private String[] roomUserName = {"","","","","",""};
+	
+	public String selectedCharacter[] = new String[8];
+	public String selectedMap = null;
 	
 	// 대기실 방 내의 유저 정보
 	class UserInfoWaitRoom {
@@ -220,6 +224,7 @@ public class ArcadeServer extends JFrame {
 				String userId = null;
 				String userName = null;
 				
+				
 				while(true) {
 					
 					try {
@@ -339,6 +344,12 @@ public class ArcadeServer extends JFrame {
 							
 							user.SendToClient("3/"+userId+"/"+userName+"/"+msgContent+"/"+contents+"\n");
 						}
+						
+						selectedCharacter[Integer.parseInt(message.split("/")[4])] = message.split("/")[5];
+						System.out.println(selectedCharacter[Integer.parseInt(message.split("/")[4])]);
+						//for (int j = 0; j < 8; j++) {
+				        //    System.out.println("Index " + j + ": " + selectedCharacter[j]);
+				        //}
 						break;
 					case 8: // 클라이언트가 시작 버튼 누를 시
 						int userCounts = Integer.parseInt(message.split("/")[4]);
@@ -363,6 +374,12 @@ public class ArcadeServer extends JFrame {
 							}
 							
 						}
+						
+						selectedCharacter[0] =  message.split("/")[5];
+						for (int i = 0; i < 8; i++) {
+				            System.out.println("Index " + i + ": " + selectedCharacter[i]);
+				        }
+						selectedMap = message.split("/")[6];
 						
 						int randomSpawnX[] = {1,1,8,14,15,7,8,8};
 						int randomSpawnY[] = {1,12,1,2,12,7,11,4};
@@ -398,11 +415,19 @@ public class ArcadeServer extends JFrame {
 							msgContents += characters[i].y;
 							msgContents += ",";
 						}
-						
+						String selectedCharacterStr = null;
 						// 게임 방 정보 전송
 						for(int i=0;i<UserVec.size();i++) {
 							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
-							user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"\n");
+							for (int j = 0; j < 8; j++) {
+					            System.out.println("Index " + j + ": " + selectedCharacter[j]);
+					            selectedCharacterStr = String.join(",", selectedCharacter);
+					        }
+							System.out.println(selectedCharacterStr);
+							//String selectedCharacterStr = String.join("*", selectedCharacter);
+							//user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacter+"/"+selectedMap+"\n"); //
+							user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"\n");
+							System.out.println("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"\n");
 						}
 						
 						break;

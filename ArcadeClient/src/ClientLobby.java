@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -27,6 +30,9 @@ public class ClientLobby extends JFrame {
 	private Socket socket;
 	public String username;
 	public String userId;
+	public String selectedCharacter;
+	public List<String> selectedCharacterList = new ArrayList<>();
+	public String selectedMap;
 	public int clientId;
 	
 	private ImageIcon bg = new ImageIcon("./LobbyImages/LobbyBackground.png"); //배경화면
@@ -200,6 +206,8 @@ public class ClientLobby extends JFrame {
 				case 3: // 서버가 클라이언트에게 모든 클라이언트의 준비 여부를 알린다
 					int userCount = 0; // 대기방 유저수
 					int readyUserCount = 0; // 준비 완료 한 유저 수
+					//selectedCharacter = msg.split("/")[6]; //
+					
 					for(int i=0;i<8;i++) {
 						if(!msg.split("/")[4].split(",")[i].equals("-"))userCount++;
 						System.out.println(roomVector.elementAt(Integer.parseInt(msgContent)).waitingRoom.waitUsers.elementAt(i).userName);
@@ -226,7 +234,11 @@ public class ClientLobby extends JFrame {
 					break;
 				case 5: // 서버가 클라이언트에게 게임 시작 시 정보 전송
 					int userCounts = Integer.parseInt(msgContent);
-					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5]);
+					
+					selectedCharacter = msg.split("/")[6]; //
+					selectedCharacterList = Arrays.asList(selectedCharacter.split(","));
+					selectedMap = msg.split("/")[7];
+					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5],selectedCharacterList);
 					break;
 				case 6: // 서버가 클라이언트에게 캐릭터의 좌표, x,y를 불러온다
 					gameInstance.UpdateCharacterVector(
