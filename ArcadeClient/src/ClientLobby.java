@@ -237,8 +237,9 @@ public class ClientLobby extends JFrame {
 					
 					selectedCharacter = msg.split("/")[6]; //
 					selectedCharacterList = Arrays.asList(selectedCharacter.split(","));
-					selectedMap = msg.split("/")[7];
-					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5],selectedCharacterList);
+					// selectedMap = msg.split("/")[7]; // 일단 맵은 나중에 추가하는거로..! - 현우
+					List<String> userNames = Arrays.asList(msg.split("/")[8].split(","));
+					gameInstance.CharacterCreate(userCounts,msg.split("/")[4],msg.split("/")[5],selectedCharacterList, userNames);
 					break;
 				case 6: // 서버가 클라이언트에게 캐릭터의 좌표, x,y를 불러온다
 					gameInstance.UpdateCharacterVector(
@@ -256,6 +257,12 @@ public class ClientLobby extends JFrame {
 					break;
 				case 101: // 플레이어 폭탄 피격당했는지 검사
 					gameInstance.isCharacterAttacked(Integer.parseInt(msg.split("/")[3]),Integer.parseInt(msg.split("/")[4]));
+					break;
+				case 102: // 플레이어가 사망했다는 메시지 전송
+					gameInstance.CharacterDied(msg.split("/")[2],Integer.parseInt(msg.split("/")[3]),Integer.parseInt(msg.split("/")[4]));
+					break;
+				case 103: // 결과창
+					gameInstance.ResultOpen(msg.split("/")[3],msg.split("/")[4]);
 					break;
 				default:
 					break;

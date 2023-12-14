@@ -1,10 +1,15 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +46,9 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	public int userCounts;
 	JLabel backgroundLabel = new JLabel(bg);
 	
+	// 플레이어 한명만 남은경우 게임오버
+	private boolean isGameOver = false;
+	
     int[][] MapArray = { //맵
 		   {0, 3, 2, 3, 2,11, 0, 0, 1,11, 5, 2, 5, 0, 5}, 
 		   {0, 4, 1, 4, 1,10, 1, 0, 0,10, 2, 3, 0, 0, 1}, 
@@ -66,13 +74,14 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 
 	private GameCharacter clientCharacter;
     
+	
+	private Vector<String> diedUserVector;
     
 	public ClientGamePlay() {
 		setTitle("크레이지아케이드 - 게임방");
 		setLocation(0,0);
 		setSize(bg.getIconWidth(),bg.getIconHeight());
 		setLayout(null);
-		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// 로비에서 서버의 응답을 수신하기 때문에, 로비의 게임플레이 인스턴스를 설정해준다 
@@ -129,29 +138,49 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         }
         
         backgroundLabel.repaint();
+        setVisible(true);
 	}
 	
-	public void CharacterCreate(int userCounts,String xList, String yList, List<String> selectedCharacter) {
+	public void CharacterCreate(int userCounts,String xList, String yList, List<String> selectedCharacter,List<String> userNames) {
 		this.userCounts = userCounts;
 		for(int i=0;i<userCounts;i++) {
 			// 캐릭터 생성
 		    int x = Integer.parseInt(xList.split(",")[i]);
 		    int y = Integer.parseInt(yList.split(",")[i]);
-			String userName = ClientLobby.instance.username;
+			String userName = userNames.get(i);
 			int clientId = ClientLobby.instance.clientId;
 			BufferedWriter out = ClientLobby.instance.out;
 			GameCharacter c = CharacterFactory.getCharacter(selectedCharacter.get(i),x,y,clientId,userName,out);
+			if(c==null) c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
 			c.currentDir = Direction.down;
-			c.setSize(60,70);
+			c.setSize(100,100);
 			c.setVisible(true);
 			c.rowIndex = x/blockWidth;
 			c.columnIndex = y/blockHeight;
 			characterVector.add(c);
 			backgroundLabel.add(c);
 			backgroundLabel.setComponentZOrder(c, 0);
+			
+			System.out.println(c.getClass().getSimpleName());
+			
+			// 오른쪽 플레이어 리스트 - 이미지
+			JLabel playerImage = new JLabel(new ImageIcon("./GamePlayImages/rightCharacter_"+c.getClass().getSimpleName()+".png"));
+			playerImage.setSize(70,50);
+			playerImage.setLocation(853,130+56*i);
+			playerImage.setVisible(true);
+			backgroundLabel.add(playerImage);
+			
+			// 오른쪽 플레이어 리스트 - 텍스트
+			JLabel characterName = new JLabel(c.username);
+			characterName.setSize(70,20);
+			characterName.setLocation(925,132+56*i);
+			characterName.setForeground(Color.WHITE);
+			characterName.setVisible(true);
+			backgroundLabel.add(characterName);
 		}
 		int clientId = ClientLobby.instance.clientId;
 		clientCharacter = characterVector.elementAt(clientId);
+		backgroundLabel.repaint();
 	}
 	
 	public void UpdateCharacterVector(String xList, String yList, int moveDir, int characterIndex) {
@@ -186,11 +215,27 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	
 	// 폭탄 설치
 	public void SetBomb(int row, int col, int characterIndex) {
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
+		
 		characterVector.elementAt(characterIndex).attack(row,col,backgroundLabel,MapArray);
+		SoundManager.getInstance().playSound(SoundManager.SoundEnum.bomb_set); // 폭탄 설치 사운드
+		
+        // 2초 후에 특정 기능 수행 - 폭발사운드
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                SoundManager.getInstance().playSound(SoundManager.SoundEnum.bomb_explosion);
+            }
+        }, 2000); // 2000 밀리초 = 2초
 	}
 	
 	// 물풍선 터지면, 블록 지우기
 	public void DeleteBlockInMap(int row, int col) {
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
+		
 		MapArray[col][row] = 0;
 		MapLabelArray[col][row].setVisible(false);
 		repaint();
@@ -198,17 +243,55 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	
 	// 플레이어 피격시
 	public void CharacterAttacked(int client_id) {
-		characterVector.elementAt(client_id).Attacked();
+		characterVector.elementAt(client_id).Attacked(client_id);
 		repaint();
 	}
 	
 	// 플레이어 피격 검사
 	public void isCharacterAttacked(int x, int y) {
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
+        
 		for(int i=0;i<userCounts;i++) {
 			if(x == characterVector.elementAt(i).rowIndex && y == characterVector.elementAt(i).columnIndex) {
-				characterVector.elementAt(i).Attacked();
+				characterVector.elementAt(i).Attacked(i);
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.trapped); // 폭탄 설치 사운드
 			}
 		}
+	}
+	
+	// 플레이어 사망
+	public void CharacterDied(String userName, int client_id, int dieOrder) {
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
+        
+        SoundManager.getInstance().playSound(SoundManager.SoundEnum.player_die);
+        
+		characterVector.elementAt(client_id).diedIndex = dieOrder; // 몇번재 순서로 죽었는지 체크
+		if(dieOrder==userCounts-1) { // 마지막에 한 유저만 남았다면
+			isGameOver = true; // 게임 오버
+			
+			try {
+				clientCharacter.out.write("103/_/_/_"+"\n");
+				clientCharacter.out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void ResultOpen(String _cliId, String _diedOrder) {
+		// 패배 결과화면
+		if(clientCharacter.isDead) { 
+			JLabel resultLabel = new ResultLabel(false, _cliId, _diedOrder, backgroundLabel);
+		}
+		// 승리 결과화면
+		else { 
+			JLabel resultLabel = new ResultLabel(true, _cliId, _diedOrder, backgroundLabel);
+		}
+		
+		backgroundLabel.repaint();
+		repaint();
 	}
 	
     @Override
@@ -216,8 +299,14 @@ public class ClientGamePlay extends JFrame implements KeyListener {
         // keyPressed는 키를 눌렀을 때 호출됩니다.
         int keyCode = e.getKeyCode();
 
+        // 생성 아직 안됬으면 실행 X
+        if(clientCharacter==null) return;
+        
         // 만약 캐릭터가 사망시 실행X
         if(clientCharacter.isDead) return;
+        
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
         
         switch (keyCode) {
             case KeyEvent.VK_UP:
@@ -284,4 +373,72 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		}
 
 	}
+	
+	// 결과창
+	class ResultLabel extends JLabel{
+		private ImageIcon resultPanel = new ImageIcon("./GamePlayImages/resultPanel.png");
+		private ImageIcon loseLabel_0 = new ImageIcon("./GamePlayImages/loseLabel_0.png");
+		private ImageIcon loseLabel_1 = new ImageIcon("./GamePlayImages/loseLabel_1.png");
+		private ImageIcon winLabel_0 = new ImageIcon("./GamePlayImages/winLabel_0.png");
+		private ImageIcon winLabel_1 = new ImageIcon("./GamePlayImages/winLabel_1.png");
+		private ImageIcon rankLabelImage = new ImageIcon("./GamePlayImages/rankLabel.png");
+		
+		JLabel winOrLose;
+		
+		public ResultLabel(boolean isWin, String _cliId, String _diedOrder, JLabel background) {
+			if(isWin) {
+				winOrLose = new JLabel(winLabel_0);
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.player_win);
+				winOrLose.setLocation(250,50);
+			}
+			else {
+				winOrLose = new JLabel(loseLabel_0);
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.player_lose);
+				winOrLose.setLocation(230,50);
+			}
+			winOrLose.setVisible(true);
+			winOrLose.setSize(400,100);
+			
+			background.add(winOrLose);
+			background.setComponentZOrder(winOrLose, 0);
+			
+			JLabel resultLabel = new JLabel(resultPanel);
+			resultLabel.setSize(resultPanel.getIconWidth(),resultPanel.getIconHeight());
+			resultLabel.setLocation(120,200);
+			resultLabel.setVisible(true);
+			background.add(resultLabel);
+			
+			int clientCnt = _cliId.split(",").length;
+			
+			for(int i=0;i<clientCnt;i++) {
+				
+				String userTxt = "     ";
+				userTxt += characterVector.elementAt(Integer.parseInt(_cliId.split(",")[i])).username + "            ";
+				if(characterVector.elementAt(Integer.parseInt(_cliId.split(",")[i])).diedIndex==-1) userTxt += "1등            ";
+				else userTxt += characterVector.elementAt(Integer.parseInt(_cliId.split(",")[i])).diedIndex+1+"등            ";
+				userTxt += characterVector.elementAt(Integer.parseInt(_cliId.split(",")[i])).getClass().getSimpleName();
+				
+				JLabel rankLabel = new JLabel(rankLabelImage);
+				rankLabel.setHorizontalAlignment(JLabel.CENTER);
+				rankLabel.setLocation(15,50+42*i);
+				rankLabel.setSize(600,40);
+				rankLabel.setVisible(true);
+				resultLabel.add(rankLabel);
+				
+				JLabel rankText = new JLabel(userTxt);
+				rankText.setVisible(true);
+				rankText.setLocation(100,7);
+				rankText.setSize(400,20);
+				rankText.setFont(new Font("Serif",Font.BOLD,15));
+				rankText.setForeground(Color.WHITE);
+				rankLabel.add(rankText);
+			}
+			
+			background.setComponentZOrder(resultLabel, 0);
+			
+			repaint();
+		}
+	}
+
 }
+

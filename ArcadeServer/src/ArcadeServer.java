@@ -65,6 +65,7 @@ public class ArcadeServer extends JFrame {
 		public int attackRange;
 		public boolean isDead;
 		public int dir;
+		public int diedOrder = -1; // 몇 번째로 죽었는지 체크
 	}
 	
 	// 게임에서 유저 캐릭터 정보
@@ -82,6 +83,9 @@ public class ArcadeServer extends JFrame {
 	int height = 600;
 	int port = 9999;
 	int clientId = 0;
+	
+	// 플레이어 몇 번째로 죽었는지 체크
+	int DeathCountOrder = 0;
 	
 	public static void main(String[] args) {
 		ArcadeServer server = new ArcadeServer();
@@ -237,7 +241,7 @@ public class ArcadeServer extends JFrame {
 						break;
 					}
 					// 클라이언트로부터 메세지를 얻어온다. 이때 메세지는 타입에 따라 다른 행동을 한다.
-					// 여기서 메세지는 아래 예시처럼 "//"으로 타입과 메세지를 구분한다.
+					// 여기서 메세지는 아래 예시처럼 "/"으로 타입과 메세지를 구분한다.
 					// 1은 클라이언트가 서버에 접속한 경우,  -  "1/로그인했습니다"
 					// 2는 클라이언트가 채팅방에 메시지를 입력하는 경우,  -  "2/유저 1 : 안녕하세요"
 					System.out.println(message);
@@ -392,6 +396,7 @@ public class ArcadeServer extends JFrame {
 							c.y = randomSpawnY[randInt]*51 - 25;
 							c.clientId = _targetRoom.clientId[i];
 							characters[i] = c;
+							characters[i].username = _targetRoom.userName[i];
 						}
 						
 						// 해당 방 초기화
@@ -415,6 +420,11 @@ public class ArcadeServer extends JFrame {
 							msgContents += characters[i].y;
 							msgContents += ",";
 						}
+						String userNames = "";
+						for(int i=0;i<userCounts;i++) {
+							userNames += characters[i].username;
+							userNames += ",";
+						}
 						String selectedCharacterStr = null;
 						// 게임 방 정보 전송
 						for(int i=0;i<UserVec.size();i++) {
@@ -423,11 +433,10 @@ public class ArcadeServer extends JFrame {
 					            System.out.println("Index " + j + ": " + selectedCharacter[j]);
 					            selectedCharacterStr = String.join(",", selectedCharacter);
 					        }
-							System.out.println(selectedCharacterStr);
 							//String selectedCharacterStr = String.join("*", selectedCharacter);
 							//user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacter+"/"+selectedMap+"\n"); //
-							user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"\n");
-							System.out.println("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"\n");
+							user.SendToClient("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"/"+userNames+"\n");
+							System.out.println("5/"+userId+"/"+userName+"/"+userCounts+"/"+msgContents+"/"+selectedCharacterStr+"/"+selectedMap+"/"+userNames+"\n");
 						}
 						
 						break;
@@ -501,6 +510,40 @@ public class ArcadeServer extends JFrame {
 						for(int i=0;i<UserVec.size();i++) {
 							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
 							user.SendToClient("101/_/_/"+explosionX+"/"+explosionY+"/"+"\n");
+						}
+						
+						break;
+					case 102: // 플레이어가 사망시
+						int cli_id = Integer.parseInt(message.split("/")[3]); // 클라 아이디
+						
+						if(characters[cli_id].diedOrder != -1) return; // 사망했다는 메세지를 여러 클라이언트가 보내지만, 이때 서버는 한번만 시행되야 한다
+						int deathCountOrder = ++DeathCountOrder; // 몇 번째로 죽었는지 등수 순서 체크
+						characters[cli_id].diedOrder = deathCountOrder;
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("102/_/"+userName+"/"+cli_id+"/"+deathCountOrder+"/"+"\n");
+						}
+						
+						break;
+					case 103: // 플레이어 한 명만 남으면, 서버는 결과창을 띄우는 메시지를 클라로 전송
+						
+						String msg_contents = "";
+						for(int i=0;i<8;i++) {
+							if(characters[i]==null) break;
+							msg_contents += characters[i].clientId;
+							msg_contents += ",";
+						}
+						msg_contents += "/";
+						for(int i=0;i<8;i++) {
+							if(characters[i]==null) break;
+							msg_contents += characters[i].diedOrder;
+							msg_contents += ",";
+						}
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("103/_/_/"+msg_contents+"/"+"\n");
 						}
 						
 						break;

@@ -186,6 +186,8 @@ public abstract class GameCharacter extends JLabel{
 	public int rowIndex;
 	public int columnIndex;
 	
+	public int diedIndex = -1;// 몇 번째로 죽었는가 체크
+	
 	// 캐릭터 이미지
 	public ImageIcon frontMove[] = new ImageIcon[6];
 	public ImageIcon leftMove[] = new ImageIcon[6];
@@ -250,14 +252,14 @@ public abstract class GameCharacter extends JLabel{
 			int index = 0;
             while (true) {
                 try {
-                    Thread.sleep(150);  // 100밀리초마다 쉬면서 이동
+                    Thread.sleep(100);  // 100밀리초마다 쉬면서 이미지 변경
                     bombLabel.setIcon(bomb[(index++)%4]);
-                    if(index==12) { // 폭발
+                    if(index==20) { // 폭발
                     	bombExplosion(Direction.middle,row,col,background,map);
                     	if(row>0) bombExplosion(Direction.left,row-1,col,background,map);
-                    	if(row<15) bombExplosion(Direction.right,row+1,col,background,map);
+                    	if(row<14) bombExplosion(Direction.right,row+1,col,background,map);
                     	if(col>0) bombExplosion(Direction.up,row,col-1,background,map);
-                    	if(col<13) bombExplosion(Direction.down,row,col+1,background,map);
+                    	if(col<12) bombExplosion(Direction.down,row,col+1,background,map);
                     	bombLabel.setVisible(false);
                     }
                 } catch (InterruptedException e) {
@@ -289,7 +291,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
+	                    Thread.sleep(100);  // 100밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombMiddle[(index++)%5]);
 	                    if(index==5) {
 	                    	explosionLabel.setVisible(false);
@@ -443,11 +445,47 @@ public abstract class GameCharacter extends JLabel{
 		}
 	}
 	
-	public void Attacked() {
-		setIcon(attackedImages[0]);
+	public void Attacked(int diedClient) {
 		isDead=true;
+		Thread attackedThread = new Thread(() -> {
+			int index = 0;
+            while (true) {
+                try {
+                    Thread.sleep(100);  // 100밀리초마다 이미지 변경
+                    if(index<=5) {
+                    	setIcon(attackedImages[index++%6]);
+                    }
+                    else {
+                    	if(index>=73 && index<=78) { // 7.5초 지나면
+                    		setIcon(attackedImages[13+(index++%6)]);
+                    	}
+                    	else if(index>=78 && index<94) { // 8초 지나면
+                    		setIcon(attackedImages[19]);
+                    		index++;
+                    	}
+                    	else if(index>=94 && index<103) { // 9.6초 지나면 깜빡깜빡
+                        	if(index%2==0) setVisible(false);
+                        	else setVisible(true);
+                        	index++;
+                        }
+                    	else if(index==103) { // 10.5초 지나면 아이콘 더이상 바꾸지 않음
+                    		index=999;
+                        	died(diedClient);
+                        	setVisible(false);
+                        }
+                    	else {
+                    		setIcon(attackedImages[6+(index++%6)]);
+                    	}
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+		});
+		attackedThread.start();
 	}
 	
+	// 각 캐릭터는 아래 두 메서드를 서버로 보내야 되기 때문에, 
+	// (서버로 메세지를 보내야 하기 때문에) OutBufferedWriter 를 받는 각 캐릭터에서 다시 정의해 줘야 함
 	public abstract void BlockDestroyMessage(int x, int y);
-	public abstract void died();
+	public abstract void died(int diedClient);
 }

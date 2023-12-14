@@ -3,6 +3,8 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -83,8 +85,12 @@ public class ArcadeClient extends JFrame{
 		btnConnect.setSize(gameStartButtonImg.getIconWidth(),gameStartButtonImg.getIconHeight());
 		btnConnect.setLocation(width/2-gameStartButtonImg.getIconWidth()/2,520);
 		backgroundLabel.add(btnConnect);
-		btnConnect.addActionListener(new ActionListener(){ // 액션 이벤트 처리
-			public void actionPerformed(ActionEvent e) {
+		btnConnect.addMouseListener(new MouseAdapter(){ // 액션 이벤트 처리
+		    public void mouseEntered(MouseEvent e) {
+		    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+		    }
+			public void mouseClicked(MouseEvent e) {
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click); // 마우스 클릭시 실행할 사운드
 				String username = userNameTextField.getText().trim();
 				if(username.equals("")) username="guest";
 				String id = idLabelTextField.getText().trim();
