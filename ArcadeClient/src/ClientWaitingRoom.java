@@ -269,9 +269,12 @@ public class ClientWaitingRoom extends JFrame {
 	
 	
 	public class SelectCharFunc extends MouseAdapter{
+		public void mouseEntered(MouseEvent e) {
+	    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+	    }
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			
+			SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
 			if (e.getSource() == selectDao) {
 	            selectedCharacter = "Dao";
 	            System.out.println("Dao Selected!");
@@ -339,8 +342,12 @@ public class ClientWaitingRoom extends JFrame {
 	}
 	
 	public class SelectMapFunc extends MouseAdapter{
+		public void mouseEntered(MouseEvent e) {
+	    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+	    }
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
 			if (e.getSource() == selectVillageMap) {
 				selectedMap = "Village";
 				System.out.println("Village Map Selected!");
@@ -367,8 +374,12 @@ public class ClientWaitingRoom extends JFrame {
 	
 	// 시작 버튼 클릭시 수행할 함수
 	public class StartFunc extends MouseAdapter{
+		public void mouseEntered(MouseEvent e) {
+	    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+	    }
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
 			try {
 				// 서버로 어떤 클라이언트가 게임을 실행하는지 전송
 				// 유저 수를 세고, 서버로 전달한다. (서버에서는 준비한 유저 수와 비교해서 같으면 게임을 실행시킨다)
@@ -385,8 +396,12 @@ public class ClientWaitingRoom extends JFrame {
 	
 	// 준비 버튼 클릭시 수행할 함수
 	public class ReadyFunc extends MouseAdapter{
+		public void mouseEntered(MouseEvent e) {
+	    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+	    }
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
 			try {
 				// 서버로 어떤 클라이언트가 준비 상태를 변경하는지 전송
 				out.write("7/"+userId+"/"+username+"/"+roomNumber+"/"+clientUserIndex+"/"+selectedCharacter+"\n");

@@ -43,8 +43,12 @@ public class ClientRoom extends JButton{
 		if(idx==5) setLocation(20+(roomImage.getIconWidth()+5)*1,40+(roomImage.getIconHeight()+5)*2);
 		
 		addMouseListener(new MouseAdapter(){ // 액션 이벤트 처리	
+			public void mouseEntered(MouseEvent e) {
+		    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+		    }
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
 				// 빈 방 클릭시
 				if(!isCreated) {
 					isCreated=true;
