@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -38,6 +39,22 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 	private ImageIcon block10 = new ImageIcon("./GamePlayImages/tiles/block10.png");
 	private ImageIcon block11 = new ImageIcon("./GamePlayImages/tiles/block11.png");
 	private ImageIcon block12 = new ImageIcon("./GamePlayImages/tiles/block12.png");
+	
+	private ImageIcon speedItem[] = {
+			new ImageIcon("./GamePlayImages/Items/speed1.png"),
+			new ImageIcon("./GamePlayImages/Items/speed2.png"),
+			new ImageIcon("./GamePlayImages/Items/speed3.png")
+	};
+	private ImageIcon bombPower[] = {
+			new ImageIcon("./GamePlayImages/Items/Bpower1.png"),
+			new ImageIcon("./GamePlayImages/Items/Bpower2.png"),
+			new ImageIcon("./GamePlayImages/Items/Bpower3.png")
+	};
+	private ImageIcon bombMax[] = {
+			new ImageIcon("./GamePlayImages/Items/Bmax1.png"),
+			new ImageIcon("./GamePlayImages/Items/Bmax2.png"),
+			new ImageIcon("./GamePlayImages/Items/Bmax3.png")
+	};
 	
 	private ImageIcon dizini = new ImageIcon("./GamePlayImages/Charactor/dizini_front.png");
 	
@@ -238,7 +255,62 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		
 		MapArray[col][row] = 0;
 		MapLabelArray[col][row].setVisible(false);
+    	try { // 랜덤 아이템 생성하라는 메세지 서버로 전송
+			clientCharacter.out.write("104/_/_/"+row+"/"+col+"\n");
+		} catch (IOException e) {
+		} 
 		repaint();
+	}
+	
+	// 물풍선 터지면 아이템 등장, Lobby에서 호출
+	public void SpawnItem(int row, int col, int randomItem) {
+        // 게임 오버시 실행 X
+        if(isGameOver) return;
+        
+        // 이미 아이템 있으면 생성 X
+        if(MapLabelArray[col][row].getText().equals("item")) return;
+        
+        Thread itemThread = new Thread(()->{
+        	
+			int index = 1;
+	        
+	        // 0 : 폭탄 수 증가
+	        // 1 : 폭탄 파워 증가
+	        // 2 : 스피드 증가
+	        // 나머지 50%확률로 생성 안됬다면 실행X
+	        if(randomItem==3||randomItem==4||randomItem==5) return;
+	        
+	        // 그외에 생성된경우
+	        JLabel itemLabel = new JLabel("item");
+	        MapLabelArray[col][row] = itemLabel;
+	        
+	        itemLabel.setLocation(26+row*blockWidth,45+col*blockHeight);
+	        itemLabel.setSize(60,60);
+	        itemLabel.setVisible(true);
+	        itemLabel.setFont(new Font("",0,0));
+	        backgroundLabel.add(itemLabel);
+	        
+            while (true) {
+                try {
+                    Thread.sleep(100);  // 100밀리초마다 이미지 변경 및 플레이어가 닿았는지 검사
+    				if(randomItem==0) itemLabel.setIcon(bombMax[(index++)%3]); // 폭탄 수 증가
+    				if(randomItem==1) itemLabel.setIcon(bombPower[(index++)%3]); // 폭탄 파워 증가
+    				if(randomItem==2) itemLabel.setIcon(speedItem[(index++)%3]); // 스피드 증가
+            		for(int i=0;i<userCounts;i++) {
+            			if(row == characterVector.elementAt(i).rowIndex && col == characterVector.elementAt(i).columnIndex) {
+            				if(randomItem==0) characterVector.elementAt(i).attackRange++; // 폭탄 수 증가
+            				if(randomItem==1) characterVector.elementAt(i).bombStack++; // 폭탄 파워 증가
+            				if(randomItem==2) characterVector.elementAt(i).speed+=5; // 스피드 증가
+            				SoundManager.getInstance().playSound(SoundManager.SoundEnum.itemGet); // 아이템 먹을때 사운드
+            				itemLabel.setVisible(false);
+            				return;
+            			}
+            		}
+                } catch (InterruptedException e) {
+                }
+            }
+		});
+        itemThread.start();
 	}
 	
 	// 플레이어 피격시
@@ -255,7 +327,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 		for(int i=0;i<userCounts;i++) {
 			if(x == characterVector.elementAt(i).rowIndex && y == characterVector.elementAt(i).columnIndex) {
 				characterVector.elementAt(i).Attacked(i);
-				SoundManager.getInstance().playSound(SoundManager.SoundEnum.trapped); // 폭탄 설치 사운드
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.trapped); // 피격당함
 			}
 		}
 	}

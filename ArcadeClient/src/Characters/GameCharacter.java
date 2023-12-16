@@ -181,6 +181,7 @@ public abstract class GameCharacter extends JLabel{
 	public int y;
 	public int speed;
 	public int attackRange;
+	public int bombStack = 1;
 	public boolean isDead;
 	
 	public int rowIndex;
@@ -323,7 +324,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
+	                    Thread.sleep(100);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombUp_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -356,7 +357,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
+	                    Thread.sleep(100);  // 200밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombRight_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);
@@ -388,7 +389,7 @@ public abstract class GameCharacter extends JLabel{
 				int index = 0;
 	            while (true) {
 	                try {
-	                    Thread.sleep(200);  // 200밀리초마다 이미지 변경
+	                    Thread.sleep(100);  // 100밀리초마다 이미지 변경
 	                    explosionLabel.setIcon(bombLeft_1[(index++)%11]);
 	                    if(index==10) {
 	                    	explosionLabel.setVisible(false);

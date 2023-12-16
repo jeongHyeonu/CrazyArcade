@@ -264,6 +264,9 @@ public class ClientLobby extends JFrame {
 				case 103: // 결과창
 					gameInstance.ResultOpen(msg.split("/")[3],msg.split("/")[4]);
 					break;
+				case 104: // 아이템
+					gameInstance.SpawnItem(Integer.parseInt(msg.split("/")[3]),Integer.parseInt(msg.split("/")[4]),Integer.parseInt(msg.split("/")[5]));
+					break;
 				default:
 					break;
 				}

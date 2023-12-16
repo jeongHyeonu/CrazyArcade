@@ -22,11 +22,11 @@ public class SoundManager {
         button_mouseOn("./SoundClips/button_mouseOn.wav"),
         button_click("./SoundClips/Button_click.wav"),
         bomb_explosion("./SoundClips/explosion.wav"),
-        bomb_set("./SoundClips/bombSet.wav"),
+        bomb_set("./SoundClips/SetBomb.wav"),
         player_win("./SoundClips/win.wav"),
         player_lose("./SoundClips/lose.wav"),
         player_die("./SoundClips/playerDie.wav"),
-        itemGet("./SoundClips/itemGet.wav"),
+        itemGet("./SoundClips/ItemGet.wav"),
         gameStart("./SoundClips/gameStart.wav"),
         trapped("./SoundClips/trapped.wav"),
         ;

@@ -58,32 +58,32 @@ public class ArcadeClient extends JFrame{
 		JLabel userNameLabel = new JLabel(nameLabelImg);
 		userNameLabel.setVisible(true);
 		userNameLabel.setSize(100,30);
-		userNameLabel.setLocation(290,440);
+		userNameLabel.setLocation(290,423);
 		backgroundLabel.add(userNameLabel);
 		
 		// 유저 이름 텍스트필드
 		JTextField userNameTextField = new JTextField();
 		userNameTextField.setSize(100,25);
-		userNameTextField.setLocation(400,440);
+		userNameTextField.setLocation(400,423);
 		backgroundLabel.add(userNameTextField);
 		
 		// 아이디 라벨
 		JLabel idLabel = new JLabel(idLabelImg);
 		idLabel.setVisible(true);
 		idLabel.setSize(100,30);
-		idLabel.setLocation(290,470);
+		idLabel.setLocation(290,458);
 		backgroundLabel.add(idLabel);
 		
 		// 유저 이름 텍스트필드
 		JTextField idLabelTextField = new JTextField();
 		idLabelTextField.setSize(100,25);
-		idLabelTextField.setLocation(400,470);
+		idLabelTextField.setLocation(400,458);
 		backgroundLabel.add(idLabelTextField);
 		
 		//시작버튼
 		JButton btnConnect = new JButton(gameStartButtonImg);
 		btnConnect.setSize(gameStartButtonImg.getIconWidth(),gameStartButtonImg.getIconHeight());
-		btnConnect.setLocation(width/2-gameStartButtonImg.getIconWidth()/2,520);
+		btnConnect.setLocation(width/2-gameStartButtonImg.getIconWidth()/2,510);
 		backgroundLabel.add(btnConnect);
 		btnConnect.addMouseListener(new MouseAdapter(){ // 액션 이벤트 처리
 		    public void mouseEntered(MouseEvent e) {

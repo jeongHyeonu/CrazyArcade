@@ -547,6 +547,22 @@ public class ArcadeServer extends JFrame {
 						}
 						
 						break;
+					case 104: // 아이템 생성
+						
+				        // 랜덤하게 아이템 생성
+				        int randomIndex = (int)(Math.random()*6); // 0 1 2 3 4 5
+						String msg__contents = message.split("/")[3]; // row
+						msg__contents += "/";
+						msg__contents += message.split("/")[4]; // col
+						msg__contents += "/";
+						msg__contents += randomIndex; // 아이템 랜덤 번호
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("104/_/_/"+msg__contents+"/"+"\n");
+						}
+						
+						break;
 					default:
 						break;
 				}
