@@ -1,5 +1,9 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class ClientLobby extends JFrame {
 	public static ClientLobby instance = null;
@@ -43,6 +48,7 @@ public class ClientLobby extends JFrame {
 	private int width = bg.getIconWidth();
 	private int height = bg.getIconHeight();
 	private JTextArea textArea;
+	private JLabel backgroundLabel;
 	
 	private Vector<ClientRoom> roomVector = new Vector<ClientRoom>();
 	private ServerReceiver receiver;
@@ -65,13 +71,13 @@ public class ClientLobby extends JFrame {
 		
 		setTitle("크레이지아케이드 - 대기실");
 		setLocation(0,0);
-		setSize(width,height);
+		setSize(width,height+30);
 		setLayout(null);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// 배경
-		JLabel backgroundLabel = new JLabel(bg);
+		backgroundLabel = new JLabel(bg);
 		backgroundLabel.setSize(width,height);
 		backgroundLabel.setLocation(0,0);
 		add(backgroundLabel);
@@ -101,13 +107,36 @@ public class ClientLobby extends JFrame {
 		chatBoxLabel.setLocation(30,40);
 		chatPanelLabel.add(chatBoxLabel);
 		
-		// 대화창 내부 라벨 속 텍스트필드
+		// 로비 텍스트 쌓일 공간
 		textArea = new JTextArea();
-		textArea.setLocation(0,0);
-		textArea.setSize(chatBox.getIconWidth(),chatBox.getIconHeight());
 		textArea.setEditable(false);
-		chatBoxLabel.add(textArea);
+		textArea.setSize(chatBox.getIconWidth()-20,chatBox.getIconHeight()-50);
+		textArea.setLocation(40,50);
+		chatPanelLabel.add(textArea);
 		
+		// 대화창 내부 입력창
+		JTextField inputField = new JTextField();
+		inputField.setSize(chatBox.getIconWidth()-100,20);
+		inputField.setLocation(40,140);
+		chatPanelLabel.add(inputField);
+		chatPanelLabel.setComponentZOrder(inputField, 0);
+		
+		// 전송
+		JButton sendBtn = new JButton("전송");
+		sendBtn.setSize(80,20);
+		sendBtn.setLocation(chatBox.getIconWidth()-60,140);
+		chatPanelLabel.add(sendBtn);
+		chatPanelLabel.setComponentZOrder(sendBtn, 0);
+		sendBtn.addMouseListener(new MouseAdapter(){ // 액션 이벤트 처리	
+			public void mouseEntered(MouseEvent e) {
+		    	SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_mouseOn); // 마우스 올리면 실행할 사운드
+		    }
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				SoundManager.getInstance().playSound(SoundManager.SoundEnum.button_click);
+				sendMsgToServer(inputField.getText());
+			}
+		});
 		
 		receiver = new ServerReceiver();
 		receiver.start();
@@ -128,7 +157,7 @@ public class ClientLobby extends JFrame {
 	private void sendMsgToServer(String msg) {
 		try { // 문자열 전송
 			System.out.println(msg);
-			out.write("1/"+userId+"/"+username+"/"+msg+"\n");
+			out.write("200/"+userId+"/"+username+"/"+username+"/"+msg+"\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,7 +167,7 @@ public class ClientLobby extends JFrame {
 	
 	void AppendText(String s) {
 		textArea.append(s + "\n");
-		textArea.setCaretPosition(textArea.getText().length());
+		textArea.setCaretPosition(textArea.getDocument().getLength());
 	}
 	
 	
@@ -267,13 +296,16 @@ public class ClientLobby extends JFrame {
 				case 104: // 아이템
 					gameInstance.SpawnItem(Integer.parseInt(msg.split("/")[3]),Integer.parseInt(msg.split("/")[4]),Integer.parseInt(msg.split("/")[5]));
 					break;
+					
+				case 200: // 로비 채팅방
+					AppendText(msg.split("/")[3]+ " : " +msg.split("/")[4]);
+					break;
 				default:
 					break;
 				}
 			}
 
 		}
+	    
 	}
-	
-	
 }

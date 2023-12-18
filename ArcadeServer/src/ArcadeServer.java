@@ -563,6 +563,14 @@ public class ArcadeServer extends JFrame {
 						}
 						
 						break;
+					case 200: // 채팅 전송
+						
+						for(int i=0;i<UserVec.size();i++) {
+							ServerReceiver user = (ServerReceiver) UserVec.elementAt(i);
+							user.SendToClient("200/_/_/"+message.split("/")[3]+"/"+message.split("/")[4]+"\n");
+						}
+						
+						break;
 					default:
 						break;
 				}
