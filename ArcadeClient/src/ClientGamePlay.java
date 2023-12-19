@@ -168,7 +168,7 @@ public class ClientGamePlay extends JFrame implements KeyListener {
 			int clientId = ClientLobby.instance.clientId;
 			BufferedWriter out = ClientLobby.instance.out;
 			GameCharacter c = CharacterFactory.getCharacter(selectedCharacter.get(i),x,y,clientId,userName,out);
-			if(c==null) c = CharacterFactory.getCharacter("Bazzi",x,y,clientId,userName,out);
+			if(c==null) c = CharacterFactory.getCharacter("Random",x,y,clientId,userName,out);
 			c.currentDir = Direction.down;
 			c.setSize(100,100);
 			c.setVisible(true);
